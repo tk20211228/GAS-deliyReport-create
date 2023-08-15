@@ -28,12 +28,33 @@
         return year + '-' + month + '-' + day;
     }
 
+    function csvToObjectArray(csv) {
+        var lines = csv.trim().split("\n");
+        var headers = lines[0].split(",");
+        var objArr = [];
+        
+        for (var i = 1; i < lines.length; i++) {
+          var data = lines[i].split(",");
+          var obj = {};
+          for (var j = 0; j < headers.length; j++) {
+            obj[headers[j].trim()] = data[j].trim();
+          }
+          objArr.push(obj);
+        }
+
+        return objArr;
+      }
+      var csv = "Name,Age,Address\nAlice,28,New York\nBob,22,California";
+
+
       document.getElementById('inputGroupFileAddon').addEventListener('click', function() {
         var btn = document.getElementById('inputGroupFileAddon');
         btn.disabled = true; // ボタンを無効化
 
         var fileInput = document.getElementById('files');
         var file = fileInput.files[0];
+        var data = csvToObjectArray(csv);
+        console.log(data);
         var today = new Date();
 
         var fileName = formatDate(today) + "_" + file.name;
@@ -48,7 +69,7 @@
             // 処理が完了したら、Spinnerを非表示にし、画面を閉じます
             document.getElementById('overlay').style.display = 'none';
             google.script.host.close();
-          }).uploadFileToDrive(content, fileName);
+          }).uploadFileToDrive(content, fileName, data);
         }
         reader.readAsDataURL(file);
       });
