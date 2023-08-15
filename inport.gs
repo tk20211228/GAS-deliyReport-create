@@ -1,4 +1,4 @@
-function uploadFileToDrive(base64Data, fileName) {
+function uploadFileToDrive(base64Data, fileName,data) {
   try {
     var splitBase = base64Data.split(','),
         type = splitBase[0].split(';')[0].replace('data:', ''),
@@ -41,7 +41,11 @@ function uploadFileToDrive(base64Data, fileName) {
     }
 
     // ファイルをサブフォルダに保存
-    var file = subFolder.createFile(ss);
+    // var file = subFolder.createFile(ss);
+
+    const body = '<p>成功</p>'
+    +data[0].Name;
+    createDailog(body)
 
     return file.getName();
   } catch (f) {

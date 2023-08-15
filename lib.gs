@@ -8,6 +8,16 @@ function createError(body){
   //showModelessDialog()でも可
 }
 
+function createDailog(body){
+  var htmlOutput = HtmlService
+      .createHtmlOutput(body)
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .setWidth(533)
+      .setHeight(300);//16：9の比率に設定
+  SpreadsheetApp.getUi().showModalDialog(htmlOutput, '実行結果');
+  //showModelessDialog()でも可
+}
+
 function changeDayformatjp(){
   let test = SpreadsheetApp.getActiveRange().getValues();
   var value7 = '　完了見込(実績) ：'+Utilities.formatDate(new Date(test), "Asia/Tokyo", "yyyy/MM/dd");
