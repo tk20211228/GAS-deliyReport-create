@@ -28,21 +28,16 @@
         return year + '-' + month + '-' + day;
     }
 
-    function csvToObjectArray(csv) {
-        var lines = csv.trim().split("\n");
-        var headers = lines[0].split(",");
-        var objArr = [];
-        
-        for (var i = 1; i < lines.length; i++) {
-          var data = lines[i].split(",");
-          var obj = {};
-          for (var j = 0; j < headers.length; j++) {
-            obj[headers[j].trim()] = data[j].trim();
-          }
-          objArr.push(obj);
-        }
+    function csvToArray(csv) {
+  var lines = csv.trim().split("\n");
+  var result = [];
 
-        return objArr;
+  for (var i = 0; i < lines.length; i++) {
+    var data = lines[i].split(",").map(item => item.trim());
+    result.push(data);
+  }
+
+  return result;
       }
       var csv = "Name,Age,Address\nAlice,28,New York\nBob,22,California";
 
@@ -53,14 +48,23 @@
 
         var fileInput = document.getElementById('files');
         var file = fileInput.files[0];
-        var data = csvToObjectArray(csv);
-        console.log(data);
         var today = new Date();
 
         var fileName = formatDate(today) + "_" + file.name;
         var reader = new FileReader();
         reader.onloadend = function(e) {
+
+
+
          var content = reader.result;
+
+         var csv = e.target.result;
+        console.log('data1');
+        console.log(csv);
+         var data = csvToArray(csv);  // ← csvToObjectArrayからcsvToArrayに変更したのを覚えておいてください。
+         console.log(data);
+        console.log('data2');
+
 
           // Spinnerを表示
           document.getElementById('overlay').style.display = 'block';
