@@ -29,15 +29,15 @@
     }
 
     function csvToArray(csv) {
-  var lines = csv.trim().split("\n");
-  var result = [];
+        var lines = csv.trim().split("\n");
+        var result = [];
 
-  for (var i = 0; i < lines.length; i++) {
-    var data = lines[i].split(",").map(item => item.trim());
-    result.push(data);
-  }
+        for (var i = 0; i < lines.length; i++) {
+          var data = lines[i].split(",").map(item => item.trim());
+          result.push(data);
+        }
 
-  return result;
+        return result;
       }
       var csv = "Name,Age,Address\nAlice,28,New York\nBob,22,California";
 
@@ -60,8 +60,8 @@
 
          var csv = e.target.result;
         console.log('data1');
-        console.log(csv);
-         var data = csvToArray(csv);  // ← csvToObjectArrayからcsvToArrayに変更したのを覚えておいてください。
+        console.log(content);
+         var data = csvToArray(content);  // ← csvToObjectArrayからcsvToArrayに変更したのを覚えておいてください。
          console.log(data);
         console.log('data2');
 

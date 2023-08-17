@@ -41,10 +41,15 @@ function uploadFileToDrive(base64Data, fileName,data) {
     }
 
     // ファイルをサブフォルダに保存
-    // var file = subFolder.createFile(ss);
+    // var file = subFolder.createFile(ss); 　
 
-    const body = '<p>成功</p>'
-    +data[0].Name;
+    // 
+    // CSVファイルを文字列化
+    const csvString = base64Data.getBlob().getDataAsString("Shift_JIS");
+    var values = Utilities.parseCsv(csvString);
+
+    // ダイヤログ確認
+    const body = '<p>成功</p>' + values ;
     createDailog(body)
 
     return file.getName();
