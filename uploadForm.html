@@ -2,6 +2,7 @@
   <head>
     <base target="_top">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/1.0.30/encoding.min.js"></script>
   </head>
   <body>
     <div class="input-group">
@@ -31,16 +32,13 @@
     function csvToArray(csv) {
         var lines = csv.trim().split("\n");
         var result = [];
-
         for (var i = 0; i < lines.length; i++) {
           var data = lines[i].split(",").map(item => item.trim());
           result.push(data);
         }
-
         return result;
       }
       var csv = "Name,Age,Address\nAlice,28,New York\nBob,22,California";
-
 
       document.getElementById('inputGroupFileAddon').addEventListener('click', function() {
         var btn = document.getElementById('inputGroupFileAddon');
@@ -52,30 +50,29 @@
 
         var fileName = formatDate(today) + "_" + file.name;
         var reader = new FileReader();
-        reader.onloadend = function(e) {
-
-
-
-         var content = reader.result;
-
-         var csv = e.target.result;
-        console.log('data1');
-        console.log(content);
-         var data = csvToArray(content);  // ← csvToObjectArrayからcsvToArrayに変更したのを覚えておいてください。
-         console.log(data);
-        console.log('data2');
-
+        reader.onloadend = async function(e) {
+          var uint8Array = new Uint8Array(e.target.result);
+          var charArray = Encoding.convert(uint8Array, {
+            from: 'SJIS',
+            to: 'UTF8',
+            type: 'string'
+            });
+          var data = csvToArray(charArray);
+          console.log(data);
 
           // Spinnerを表示
           document.getElementById('overlay').style.display = 'block';
 
-          google.script.run.withSuccessHandler(function(){
-            // 処理が完了したら、Spinnerを非表示にし、画面を閉じます
-            document.getElementById('overlay').style.display = 'none';
-            google.script.host.close();
-          }).uploadFileToDrive(content, fileName, data);
+          // google.script.run.withSuccessHandler(function(){
+          //   // 処理が完了したら、Spinnerを非表示にし、画面を閉じます
+          //   document.getElementById('overlay').style.display = 'none';
+          //   google.script.host.close();
+          // }).uploadFileToDrive(content, fileName, data);
+          await new Promise(r => setTimeout(r, 2000)); // 3秒間のスリープ
+          document.getElementById('overlay').style.display = 'none';
+          btn.disabled = false; // ボタンを有効化
         }
-        reader.readAsDataURL(file);
+        reader.readAsArrayBuffer(file);
       });
     </script>
 
