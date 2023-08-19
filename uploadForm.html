@@ -33,31 +33,47 @@
         var lines = csv.trim().split("\n");
         var result = [];
         for (var i = 0; i < lines.length; i++) {
-          var data = lines[i].split(",").map(item => item.trim());
-          result.push(data);
+          var arrayData = lines[i].split(",").map(item => item.trim());
+          // 二重引用符を取り除く処理
+          arrayData = arrayData.map(item => {
+              if (item.startsWith('"') && item.endsWith('"')) {
+                  return item.slice(1, -1);
+              }
+              return item;
+          });
+          result.push(arrayData);
         }
         return result;
-      }
+    }
+
       var csv = "Name,Age,Address\nAlice,28,New York\nBob,22,California";
 
       document.getElementById('inputGroupFileAddon').addEventListener('click', function() {
+        // console.log("TEST");
+        
         var btn = document.getElementById('inputGroupFileAddon');
         btn.disabled = true; // ボタンを無効化
 
         var fileInput = document.getElementById('files');
         var file = fileInput.files[0];
-        var today = new Date();
 
+        var today = new Date();
         var fileName = formatDate(today) + "_" + file.name;
+
         var reader = new FileReader();
         reader.onloadend = async function(e) {
+          var csv = e.target.result;
           var uint8Array = new Uint8Array(e.target.result);
+          const encoding = Encoding.detect(uint8Array);
+          // console.log(encoding);
           var charArray = Encoding.convert(uint8Array, {
-            from: 'SJIS',
-            to: 'UTF8',
+            from: encoding,
+            to: 'UNICODE',
             type: 'string'
             });
+
           var data = csvToArray(charArray);
+
           console.log(data);
 
           // Spinnerを表示
