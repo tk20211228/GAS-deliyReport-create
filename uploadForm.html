@@ -6,8 +6,8 @@
   </head>
   <body>
     <div class="input-group">
-      <input type="file" class="form-control" id="files" aria-describedby="inputGroupFileAddon" aria-label="Upload" name="files[]" >
-      <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon">Button</button>
+      <input type="file" class="form-control" id="files" aria-describedby="inputGroupFileAddon" aria-label="Upload" name="files[]" accept=".csv,text/csv">
+      <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon">実行</button>
     </div>
 
     <!-- Spinnerを追加 -->
@@ -46,50 +46,76 @@
         return result;
     }
 
-      var csv = "Name,Age,Address\nAlice,28,New York\nBob,22,California";
-
-      document.getElementById('inputGroupFileAddon').addEventListener('click', function() {
-        // console.log("TEST");
-        
-        var btn = document.getElementById('inputGroupFileAddon');
-        btn.disabled = true; // ボタンを無効化
-
+    // ファイルの選択状態をチェックしてボタンの活性/非活性を制御する関数
+    function checkFileSelection() {
         var fileInput = document.getElementById('files');
-        var file = fileInput.files[0];
+        var btn = document.getElementById('inputGroupFileAddon');
+        
+        if (fileInput.files.length === 0) {
+            btn.disabled = true;
+        } else {
+            btn.disabled = false;
+        }
+    }
+    // ページの読み込み時にボタンの状態をチェック
+    window.onload = checkFileSelection;
 
-        var today = new Date();
-        var fileName = formatDate(today) + "_" + file.name;
+    // ファイルの選択状態が変わったときにボタンの状態をチェック
+    document.getElementById('files').addEventListener('change', checkFileSelection);
 
-        var reader = new FileReader();
-        reader.onloadend = async function(e) {
-          var csv = e.target.result;
-          var uint8Array = new Uint8Array(e.target.result);
-          const encoding = Encoding.detect(uint8Array);
-          // console.log(encoding);
-          var charArray = Encoding.convert(uint8Array, {
-            from: encoding,
-            to: 'UNICODE',
-            type: 'string'
-            });
+    document.getElementById('inputGroupFileAddon').addEventListener('click', function() {
+      // console.log("TEST");
+      
+      var btn = document.getElementById('inputGroupFileAddon');
+      btn.disabled = true; // ボタンを無効化
 
-          var data = csvToArray(charArray);
+      var fileInput = document.getElementById('files');
+      var file = fileInput.files[0];
 
-          console.log(data);
+      var today = new Date();
+      var fileName = formatDate(today) + "_" + file.name;
 
-          // Spinnerを表示
-          document.getElementById('overlay').style.display = 'block';
+      var reader = new FileReader();
+      reader.onloadend = function(e) {
+        var content = reader.result;
+        var csvfile = e.target.result;
+        var uint8Array = new Uint8Array(csvfile);
+        const encoding = Encoding.detect(uint8Array);
+        // console.log(encoding);
+        var charArray = Encoding.convert(uint8Array, {
+          from: encoding,
+          to: 'UNICODE',
+          type: 'string'
+          });
 
-          // google.script.run.withSuccessHandler(function(){
-          //   // 処理が完了したら、Spinnerを非表示にし、画面を閉じます
-          //   document.getElementById('overlay').style.display = 'none';
-          //   google.script.host.close();
-          // }).uploadFileToDrive(content, fileName, data);
-          await new Promise(r => setTimeout(r, 2000)); // 3秒間のスリープ
+        var csvArraryData = csvToArray(charArray);
+
+        console.log("csvArraryData",csvArraryData);
+
+        console.log(content);
+        console.log(csvfile);
+        console.log(fileName);
+
+        // Spinnerを表示
+        document.getElementById('overlay').style.display = 'block';
+
+        google.script.run.withSuccessHandler(function(){
+
+          // 処理が完了したら、Spinnerを非表示にし、画面を閉じる
+          // google.script.host.close();
+          // await new Promise(r => setTimeout(r, 2000)); // 3秒間のスリープ
           document.getElementById('overlay').style.display = 'none';
           btn.disabled = false; // ボタンを有効化
-        }
-        reader.readAsArrayBuffer(file);
-      });
+          // google.script.host.close();
+
+        }).uploadFileToDrive(content,fileName);
+
+
+
+      }
+      // reader.readAsArrayBuffer(file);
+      reader.readAsDataURL(file);
+    });
     </script>
 
   </body>

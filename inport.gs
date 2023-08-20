@@ -1,5 +1,42 @@
-function uploadFileToDrive(base64Data, fileName,data) {
+
+function CSVStringToArray(strData) {
+    var rows = strData.trim().split("\n");
+    return rows.map(function(row) {
+        var arrayDate = row.split(",");
+        // 二重引用符を取り除く処理
+        arrayDate = arrayDate.map(item => {
+          if(item.startsWith('"') && item.endsWith('"')){
+            return item.slice(1,-1);
+          }
+          return item;
+        })
+        return arrayDate;
+    });
+}
+
+function uploadFileToDrive(base64Data,fileName) {
   try {
+    var date = base64Data.split(",")[1];
+    console.log("csvArray",csvArray);
+    // Base64データをバイト配列にデコード
+    var decodedBytes = Utilities.base64Decode(date);
+
+    // バイト配列を文字列に変換
+    var csvString = Utilities.newBlob(decodedBytes).getDataAsString('Shift_JIS');
+
+    // CSV文字列を配列に変換
+    var csvArray = CSVStringToArray(csvString);
+
+    console.log(csvArray);
+
+
+
+
+
+
+
+
+
     var splitBase = base64Data.split(','),
         type = splitBase[0].split(';')[0].replace('data:', ''),
         byteCharacters = Utilities.base64Decode(splitBase[1]),
@@ -41,15 +78,15 @@ function uploadFileToDrive(base64Data, fileName,data) {
     }
 
     // ファイルをサブフォルダに保存
-    // var file = subFolder.createFile(ss); 　
+    // var file = subFolder.createFile(ss);
 
     // 
     // CSVファイルを文字列化
-    const csvString = base64Data.getBlob().getDataAsString("Shift_JIS");
-    var values = Utilities.parseCsv(csvString);
+    // const csvString = base64Data.getBlob().getDataAsString("Shift_JIS");
+    // var values = Utilities.parseCsv(csvString);
 
     // ダイヤログ確認
-    const body = '<p>成功</p>' + values ;
+    const body = '<p>成功</p>'+ csvArray[1][0] ; // 
     createDailog(body)
 
     return file.getName();
@@ -60,7 +97,7 @@ function uploadFileToDrive(base64Data, fileName,data) {
 
 
 function csvInput() {
-  let title = 'title';
+  let title = 'CSV入力';
 
     const myName = getMyname();
     console.log(myName[0])
