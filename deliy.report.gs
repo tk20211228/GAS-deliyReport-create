@@ -10,7 +10,7 @@ function checkDay(activeSheet){
   //日付取得に失敗し処理を継続しない場合
   if(day_answer === 'no') {
       try{
-        var day =Utilities.formatDate(selectValue, "Asia/Tokyo", "yyyy/MM/dd");
+        var day = Utilities.formatDate(selectValue, "Asia/Tokyo", "yyyy/MM/dd");
         }catch(day){
           console.log(day);
           const body = '<p>出力したい日付を選択し、実行してください。</p><p>【エラー内容】</p>'+day;

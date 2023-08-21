@@ -78,11 +78,14 @@
       var reader = new FileReader();
       reader.onloadend = function(e) {
         var content = reader.result;
-        var csvfile = e.target.result;
-        var uint8Array = new Uint8Array(csvfile);
-        const encoding = Encoding.detect(uint8Array);
+
+        // base64部分のみを取得
+        var base64Data = content.split(',')[1];
+        // base64をデコードしてUint8Arrayを取得
+        var decodedData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+        const encoding = Encoding.detect(decodedData);
         // console.log(encoding);
-        var charArray = Encoding.convert(uint8Array, {
+        var charArray = Encoding.convert(decodedData, {
           from: encoding,
           to: 'UNICODE',
           type: 'string'
@@ -91,9 +94,6 @@
         var csvArraryData = csvToArray(charArray);
 
         console.log("csvArraryData",csvArraryData);
-
-        console.log(content);
-        console.log(csvfile);
         console.log(fileName);
 
         // Spinnerを表示

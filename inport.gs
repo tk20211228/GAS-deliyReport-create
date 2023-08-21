@@ -29,14 +29,6 @@ function uploadFileToDrive(base64Data,fileName) {
 
     console.log(csvArray);
 
-
-
-
-
-
-
-
-
     var splitBase = base64Data.split(','),
         type = splitBase[0].split(';')[0].replace('data:', ''),
         byteCharacters = Utilities.base64Decode(splitBase[1]),
@@ -86,7 +78,23 @@ function uploadFileToDrive(base64Data,fileName) {
     // var values = Utilities.parseCsv(csvString);
 
     // ダイヤログ確認
-    const body = '<p>成功</p>'+ csvArray[1][0] ; // 
+    const data = new Date();
+    const today = Utilities.formatDate(data, "Asia/Tokyo", "yyyy-MM-dd");
+
+    const csvArrayTodayIndex = csvArray[0].indexOf(today);
+    // for(i=1;i<csvArray.length;i++){
+      
+    // }
+
+
+
+    const body = `
+    <p>成功</p>
+    <p>${csvArray[1][0]}</p>
+    <p>${today}</p>
+    <p>${csvArrayTodayIndex}</p>
+    <p>${csvArray.length}</p>
+    `; // 
     createDailog(body)
 
     return file.getName();
