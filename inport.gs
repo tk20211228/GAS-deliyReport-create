@@ -17,7 +17,7 @@ function CSVStringToArray(strData) {
 function uploadFileToDrive(base64Data,fileName) {
   try {
     var date = base64Data.split(",")[1];
-    console.log("csvArray",csvArray);
+    // console.log("csvArray",csvArray);
     // Base64データをバイト配列にデコード
     var decodedBytes = Utilities.base64Decode(date);
 
@@ -27,7 +27,7 @@ function uploadFileToDrive(base64Data,fileName) {
     // CSV文字列を配列に変換
     var csvArray = CSVStringToArray(csvString);
 
-    console.log(csvArray);
+    // console.log(csvArray);
 
     var splitBase = base64Data.split(','),
         type = splitBase[0].split(';')[0].replace('data:', ''),
@@ -45,7 +45,7 @@ function uploadFileToDrive(base64Data,fileName) {
     }
 
     var subFolderName = myName[0]; // サブフォルダ名
-    console.log(subFolderName)
+    // console.log(subFolderName)
 
 
 
@@ -82,20 +82,43 @@ function uploadFileToDrive(base64Data,fileName) {
     const today = Utilities.formatDate(data, "Asia/Tokyo", "yyyy-MM-dd");
 
     const csvArrayTodayIndex = csvArray[0].indexOf(today);
-    // for(i=1;i<csvArray.length;i++){
+    const todayTaskTimeList = [];
+
+
+    console.log("mainsheet");
+    const mainsheet = SpreadsheetApp.getActiveSpreadsheet();
+    // console.log(mainsheet);
+
+    const mySheet = mainsheet.getSheetByName(myName[0]);
+    // console.log(mySheet);
+
+    const mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
+    console.log(mySheetTaskList);
+    
+    for(i=1;i<csvArray.length;i++){
+      if(!csvArray[i][csvArrayTodayIndex]) continue;
+      todayTaskTimeList.push([csvArray[i][0],csvArray[i][csvArrayTodayIndex]]);
       
-    // }
+      
+    }
+    console.log(todayTaskTimeList);
+
+    
+
+
+    
 
 
 
-    const body = `
-    <p>成功</p>
-    <p>${csvArray[1][0]}</p>
-    <p>${today}</p>
-    <p>${csvArrayTodayIndex}</p>
-    <p>${csvArray.length}</p>
-    `; // 
-    createDailog(body)
+    // const body = `
+    // <p>成功</p>
+    // <p>${csvArray[1][0]}</p>
+    // <p>${today}</p>
+    // <p>${csvArrayTodayIndex}</p>
+    // <p>${csvArray.length}</p>
+    // <p>${todayTaskTimeList.toString}</p>
+    // `; // 
+    // // createDailog(body)
 
     return file.getName();
   } catch (f) {

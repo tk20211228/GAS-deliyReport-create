@@ -169,9 +169,9 @@ function inputPlanCellsNexst() {
   console.log(choicePlaceRow+","+choicePlaceColmmon);
   const mainsheet1 = SpreadsheetApp.getActiveSheet();
   const tasklist = mainsheet1.getRange(choicePlaceRow,choicePlaceColmmon-2,1,4).getValues();
-  console.log(tasklist);
+  // console.log(tasklist);
   const uniqueId =  tasklist[0][3] + Utilities.formatDate(new Date(), "Asia/Tokyo", "yyyy/MM/dd/HH:mm:ss");
-  console.log(uniqueId);
+  // console.log(uniqueId);
 
   mainsheet1.getRange(choicePlaceRow,choicePlaceColmmon+12,4,1).setValues([[uniqueId],[uniqueId],[uniqueId],[uniqueId]]);
   const sheetlist = SpreadsheetApp.getActive().getSheets();
@@ -181,8 +181,8 @@ function inputPlanCellsNexst() {
     sheetNamelist[i]= sheetName;
 
   }
-  console.log(sheetNamelist);
-  console.log(tasklist[0][3]);
+  // console.log(sheetNamelist);
+  // console.log(tasklist[0][3]);
   const sheetJudgement = sheetNamelist.includes(tasklist[0][3]);
   console.log(sheetJudgement);
   if(!sheetJudgement){
@@ -192,9 +192,9 @@ function inputPlanCellsNexst() {
   const mainSheet2 = mainsheet.getSheetByName(tasklist[0][3]);
   console.log(mainSheet2.getRange(1,1).getValue());
   const valuelastRow = mainSheet2.getLastRow();
-  console.log(valuelastRow);
+  // console.log(valuelastRow);
   const lastRow = mainSheet2.getMaxRows();
-  console.log(lastRow);
+  // console.log(lastRow);
   //行を追加
   mainSheet2.insertRowsAfter(lastRow, 17);
   const copySheet = mainsheet.getSheetByName("コピー元(速)");
