@@ -13,6 +13,17 @@ function CSVStringToArray(strData) {
         return arrayDate;
     });
 }
+// Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換する関数
+function formatDate(date) {
+    return Utilities.formatDate(date, "Asia/Tokyo", "yyyy-MM-dd");
+}
+
+// 特定の日付のインデックスを取得するための関数
+function findDateIndex(dateString, arr) {
+    return arr.indexOf(dateString);
+}
+
+
 
 function uploadFileToDrive(base64Data,fileName) {
   try {
@@ -85,7 +96,7 @@ function uploadFileToDrive(base64Data,fileName) {
     const todayTaskTimeList = [];
 
 
-    console.log("mainsheet");
+    // console.log("mainsheet");
     const mainsheet = SpreadsheetApp.getActiveSpreadsheet();
     // console.log(mainsheet);
 
@@ -93,11 +104,25 @@ function uploadFileToDrive(base64Data,fileName) {
     // console.log(mySheet);
 
     const mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
-    console.log(mySheetTaskList);
+    // console.log(mySheetTaskList);
+
+
+    const mySheetdayList = mySheet.getRange("5:5").getValues().flat();
+    // 配列を更新して、Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換
+    const mySheetdayListFormattedArray = mySheetdayList.map(item => {
+        if (item instanceof Date) {
+            return formatDate(item);
+        }
+        return item;
+    });
+    // console.log(today);
+    // console.log(mySheetdayListFormattedArray);
     
     for(i=1;i<csvArray.length;i++){
       if(!csvArray[i][csvArrayTodayIndex]) continue;
-      todayTaskTimeList.push([csvArray[i][0],csvArray[i][csvArrayTodayIndex]]);
+      let taskRow = mySheetTaskList.indexOf(csvArray[i][0]) + 4 ;
+      let taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
+      todayTaskTimeList.push([csvArray[i][0],csvArray[i][csvArrayTodayIndex],taskRow,taskCol]);
       
       
     }
