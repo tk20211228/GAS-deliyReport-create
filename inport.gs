@@ -23,6 +23,12 @@ function findDateIndex(dateString, arr) {
     return arr.indexOf(dateString);
 }
 
+/** 配列内で値が重複してないか調べる **/
+function existsSameValue(a){
+  var s = new Set(a);
+  return s.size != a.length;
+}
+
 
 
 function uploadFileToDrive(base64Data,fileName) {
@@ -104,6 +110,10 @@ function uploadFileToDrive(base64Data,fileName) {
     // console.log(mySheet);
 
     const mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
+    // if(existsSameValue(mySheetTaskList)){
+    //   Browser.msgBox("個人の進捗シートに、重複したタスク名の進捗管理表があります。");
+
+    // }
     // console.log(mySheetTaskList);
 
 
@@ -122,6 +132,7 @@ function uploadFileToDrive(base64Data,fileName) {
       if(!csvArray[i][csvArrayTodayIndex]) continue;
       let taskRow = mySheetTaskList.indexOf(csvArray[i][0]) + 4 ;
       let taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
+      mySheet.getRange(taskRow,taskCol).setValue(csvArray[i][csvArrayTodayIndex]).setFontColor("#0000FF");
       todayTaskTimeList.push([csvArray[i][0],csvArray[i][csvArrayTodayIndex],taskRow,taskCol]);
       
       

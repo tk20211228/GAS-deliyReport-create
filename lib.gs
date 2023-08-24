@@ -197,7 +197,7 @@ function inputPlanCellsNexst() {
   // console.log(lastRow);
   //行を追加
   mainSheet2.insertRowsAfter(lastRow, 17);
-  const copySheet = mainsheet.getSheetByName("コピー元(速)");
+  const copySheet = mainsheet.getSheetByName("コピー元");
   const copysheetRange = copySheet.getRange("A1:PN18")
   //コピー対象のセル範囲のデータを貼り付け先のセルにコピーする
   const firstRngen = valuelastRow+1;

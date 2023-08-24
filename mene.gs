@@ -11,7 +11,7 @@ function onOpen(){
         // .addItem('「進捗入力（空）を作成」', 'c')//マクロ.gsで管理
         // .addItem('全体把握から進捗入力を作成', 'inputPlanCells')//lib.gsで管理
         .addItem('全体把握から進捗入力を作成(高速版)', 'inputPlanCellsNexst')//lib.gsで管理
-        .addItem('CSV入力※作成中', 'csvInput')//lib.gsで管理
+        .addItem('CSV入力(各自のシートに入力) Ver.Beta', 'csvInput')//lib.gsで管理
         .addToUi();
       meinUI
         .createMenu('メンテナンス') 
