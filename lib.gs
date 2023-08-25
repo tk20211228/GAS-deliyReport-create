@@ -93,16 +93,16 @@ function getMyname(){
   if(!familyName){
     var name = myNameSerach();
     var familyName = name[0];
-    console.log('確認：'+familyName);
+    // console.log('確認：'+familyName);
 
     var fullName = name[1];
-    console.log('確認：'+fullName);
+    // console.log('確認：'+fullName);
     if(familyName != '（姓）'){
       setProp(userEmail,familyName);
       setProp(familyName,fullName);
     }
   }
-  console.log(name);
+  // console.log(name);
   return [familyName,fullName];
 
 }
@@ -137,9 +137,9 @@ function inputPlanCells() {
   const mainSheet2 = mainsheet.getSheetByName(tasklist[0][3]);
   console.log(mainSheet2.getRange(1,1).getValue());
   const valuelastRow = mainSheet2.getLastRow();
-  console.log(valuelastRow);
+  // console.log(valuelastRow);
   const lastRow = mainSheet2.getMaxRows();
-  console.log(lastRow);
+  // console.log(lastRow);
   //行を追加
   mainSheet2.insertRowsAfter(lastRow, 17);
   const copySheet = mainsheet.getSheetByName("コピー元");

@@ -54,7 +54,7 @@ function uploadFileToDrive(base64Data,fileName) {
 
     var dropbox = "redmine_月間工数"; // フォルダ名
     const myName = getMyname();
-    console.log(myName)
+    // console.log(myName)
     if(!myName[1]) {
         const body = '<p>エラー内容をご確認ください。</p><p>【エラー内容】</p><p>プロパティに名前が登録されていません。<br/>管理者にお問い合わせください</p>'
         createError(body);
@@ -131,13 +131,23 @@ function uploadFileToDrive(base64Data,fileName) {
     for(i=1;i<csvArray.length;i++){
       if(!csvArray[i][csvArrayTodayIndex]) continue;
       let taskRow = mySheetTaskList.indexOf(csvArray[i][0]) + 4 ;
+      // console.log(taskRow);
       let taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
+      todayTaskTimeList.push([
+        csvArray[i][0],
+        csvArray[i][csvArrayTodayIndex],
+        taskRow,
+        taskCol
+        ]);
+      if(taskRow == 3) continue;
+
       mySheet.getRange(taskRow,taskCol).setValue(csvArray[i][csvArrayTodayIndex]).setFontColor("#0000FF");
-      todayTaskTimeList.push([csvArray[i][0],csvArray[i][csvArrayTodayIndex],taskRow,taskCol]);
       
       
     }
-    console.log(todayTaskTimeList);
+    // console.log(todayTaskTimeList);
+    // mySheet.insertRowsAfter(1, 17);
+    // mySheet.getRange(1,1,1,1).shiftColumnGroupDepth(3);
 
     
 
@@ -156,9 +166,9 @@ function uploadFileToDrive(base64Data,fileName) {
     // `; // 
     // // createDailog(body)
 
-    return file.getName();
+    // return file.getName();
   } catch (f) {
-    return f.toString();
+    // return f.toString();
   }
 }
 
