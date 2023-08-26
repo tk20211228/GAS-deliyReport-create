@@ -9,6 +9,28 @@
       <input type="file" class="form-control" id="files" aria-describedby="inputGroupFileAddon" aria-label="Upload" name="files[]" accept=".csv,text/csv">
       <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon">実行</button>
     </div>
+    <table class="table table-hover mt-2" id="taskTable">
+        <colgroup>
+            <col class="col-1">
+            <col class="col-10">
+            <col class="col-1">
+        </colgroup>
+        <thead>
+            <tr>
+                <th scope="col">No.</th>
+                <th scope="col">タスク名</th>
+                <th scope="col">工数</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be inserted here -->
+        </tbody>
+    </table>
+    <!-- <div class="container mt-2">
+    </div> -->
+    <div class="d-flex justify-content-end"> <!-- このdivを追加 -->
+      <button type="button" class="btn btn-outline-secondary mt-2" onclick="google.script.host.close()">閉じる</button>
+    </div>
 
     <!-- Spinnerを追加 -->
     <div id="overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5);">
@@ -63,6 +85,30 @@
     // ファイルの選択状態が変わったときにボタンの状態をチェック
     document.getElementById('files').addEventListener('change', checkFileSelection);
 
+    // テーブル内の工数を合計する関数
+    function sumHours() {
+        let total = 0;
+        const hoursElements = document.querySelectorAll("#taskTable tbody td:last-child");
+        
+        hoursElements.forEach(element => {
+            total += parseFloat(element.innerText);
+        });
+
+        return total.toFixed(2);  // 小数点第2位までの値を返す
+    }
+
+    // 既存のテーブルに合計行を追加
+    function addTotalRow() {
+        const total = sumHours();
+        const tbody = document.querySelector("#taskTable tbody");
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+            <th scope="row" colspan="2">合計</th>
+            <td>${total}</td>
+        `;
+        tbody.appendChild(newRow);
+    }
+
     document.getElementById('inputGroupFileAddon').addEventListener('click', function() {
       // console.log("TEST");
       
@@ -77,6 +123,10 @@
 
       var reader = new FileReader();
       reader.onloadend = function(e) {
+
+
+
+
         var content = reader.result;
 
         // base64部分のみを取得
@@ -92,23 +142,72 @@
           });
 
         var csvArraryData = csvToArray(charArray);
+        let index = csvArraryData[0].indexOf('2023-08-26');
+        let taskList = [];
+        for(i=1;i<csvArraryData.length;i++){
+          if(!csvArraryData[i][index]) continue;
+          taskList.push([csvArraryData[i][0],csvArraryData[i][index]]);
+        }
+        console.log(index);
+        console.log(taskList);
+        
+        // // JavaScriptで配列を取得
+        // // const taskList = ["タスクA", "タスクB", "タスクC", "タスクD", "タスクE", "タスクF", "タスクG"];
+        // // ul要素を取得
+        // const ulElement = document.querySelector(".list-group");
+        //         // 配列の内容を基にli要素を生成
+        // taskList.forEach(task => {
+        //   const liElement = document.createElement("li");
+        //   liElement.className = "list-group-item";
+        //   liElement.textContent = task;
+        //   ulElement.appendChild(liElement);
+        // });
+        const tableBody = document.querySelector('#taskTable tbody');
 
-        console.log("csvArraryData",csvArraryData);
-        console.log(fileName);
+        taskList.forEach((task, index) => {
+            const row = document.createElement('tr');
+
+            const th = document.createElement('th');
+            th.setAttribute('scope', 'row');
+            th.innerText = index + 1;
+
+            const tdName = document.createElement('td');
+            tdName.innerText = task[0];
+
+            const tdTime = document.createElement('td');
+            tdTime.innerText = task[1];
+
+            row.appendChild(th);
+            row.appendChild(tdName);
+            row.appendChild(tdTime);
+
+            tableBody.appendChild(row);
+        });
+
+        // 関数を呼び出して合計行を追加
+        addTotalRow();
+
+
+
+
+
+        // console.log("csvArraryData",csvArraryData);
+        // console.log(fileName);
 
         // Spinnerを表示
         document.getElementById('overlay').style.display = 'block';
 
-        google.script.run.withSuccessHandler(function(){
+        google.script.run.withSuccessHandler(async function (){
 
           // 処理が完了したら、Spinnerを非表示にし、画面を閉じる
           // google.script.host.close();
-          // await new Promise(r => setTimeout(r, 2000)); // 3秒間のスリープ
+          await new Promise(r => setTimeout(r, 10000)); // 3秒間のスリープ
           document.getElementById('overlay').style.display = 'none';
           btn.disabled = false; // ボタンを有効化
           // google.script.host.close();
 
         }).uploadFileToDrive(content,fileName);
+        
 
 
 

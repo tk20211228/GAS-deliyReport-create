@@ -29,6 +29,17 @@ function existsSameValue(a){
   return s.size != a.length;
 }
 
+function copyTaskTable(mainsheet,mySheet){
+  // console.log("コピー実行");
+    mySheet.insertRowsAfter(1, 18);
+    mySheet.getRange('2:18').shiftRowGroupDepth(1);
+    const copySheet = mainsheet.getSheetByName("コピー元");
+    const copysheetRange = copySheet.getRange("A1:PN18");
+    copysheetRange.copyTo(mySheet.getRange("A1:PN18"), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
+  // console.log("コピー完了");
+
+}
+
 
 
 function uploadFileToDrive(base64Data,fileName) {
@@ -61,30 +72,27 @@ function uploadFileToDrive(base64Data,fileName) {
         return
     }
 
-    var subFolderName = myName[0]; // サブフォルダ名
+    // var subFolderName = myName[0]; // サブフォルダ名
     // console.log(subFolderName)
 
-
-
-    var folders = DriveApp.getFoldersByName(dropbox);
-
+    // var folders = DriveApp.getFoldersByName(dropbox);
     // フォルダがない場合はエラーをスロー
-    var folder;
-    if (folders.hasNext()) {
-      folder = folders.next();
-    } else {
-      throw new Error("Folder not found");
-    }
+    // var folder;
+    // if (folders.hasNext()) {
+    //   folder = folders.next();
+    // } else {
+    //   throw new Error("Folder not found");
+    // }
 
     // サブフォルダを取得
-    var subFolders = folder.getFoldersByName(subFolderName);
-    var subFolder;
-    console.log(subFolders.hasNext())
-    if (subFolders.hasNext()) {
-      subFolder = subFolders.next();
-    } else {
-      subFolder = folder.createFolder(myName[0]);
-    }
+    // var subFolders = folder.getFoldersByName(subFolderName);
+    // var subFolder;
+    // console.log(subFolders.hasNext())
+    // if (subFolders.hasNext()) {
+    //   subFolder = subFolders.next();
+    // } else {
+    //   subFolder = folder.createFolder(myName[0]);
+    // }
 
     // ファイルをサブフォルダに保存
     // var file = subFolder.createFile(ss);
@@ -97,8 +105,16 @@ function uploadFileToDrive(base64Data,fileName) {
     // ダイヤログ確認
     const data = new Date();
     const today = Utilities.formatDate(data, "Asia/Tokyo", "yyyy-MM-dd");
+    // console.log(today);
+    // console.log(csvArray[0]);
 
     const csvArrayTodayIndex = csvArray[0].indexOf(today);
+    console.log(csvArrayTodayIndex);
+    if (csvArrayTodayIndex === -1) {
+      throw new Error("Today's date was not found in the CSV array.");
+    };
+
+
     const todayTaskTimeList = [];
 
 
@@ -109,7 +125,7 @@ function uploadFileToDrive(base64Data,fileName) {
     const mySheet = mainsheet.getSheetByName(myName[0]);
     // console.log(mySheet);
 
-    const mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
+    let mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
     // if(existsSameValue(mySheetTaskList)){
     //   Browser.msgBox("個人の進捗シートに、重複したタスク名の進捗管理表があります。");
 
@@ -127,31 +143,60 @@ function uploadFileToDrive(base64Data,fileName) {
     });
     // console.log(today);
     // console.log(mySheetdayListFormattedArray);
-    
-    for(i=1;i<csvArray.length;i++){
-      if(!csvArray[i][csvArrayTodayIndex]) continue;
-      let taskRow = mySheetTaskList.indexOf(csvArray[i][0]) + 4 ;
-      // console.log(taskRow);
-      let taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
-      todayTaskTimeList.push([
-        csvArray[i][0],
-        csvArray[i][csvArrayTodayIndex],
-        taskRow,
-        taskCol
-        ]);
-      if(taskRow == 3) continue;
+      // console.log("try開始");
+      for(i=1;i<csvArray.length;i++){
+        if(!csvArray[i][csvArrayTodayIndex]) continue;
+        let taskRow = mySheetTaskList.indexOf(csvArray[i][0]) + 4 ;
+        // console.log(taskRow);
+        let taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
+        console.log(taskCol);
+        if (taskCol === 0) {
+          throw new Error(today+"を、進捗シートの”5:5”から見つけることができませんでした。");
+        };
 
-      mySheet.getRange(taskRow,taskCol).setValue(csvArray[i][csvArrayTodayIndex]).setFontColor("#0000FF");
-      
-      
-    }
-    // console.log(todayTaskTimeList);
-    // mySheet.insertRowsAfter(1, 17);
-    // mySheet.getRange(1,1,1,1).shiftColumnGroupDepth(3);
+        todayTaskTimeList.push([
+          csvArray[i][0],
+          csvArray[i][csvArrayTodayIndex],
+          taskRow,
+          taskCol
+          ]);
+        if(taskRow == 3) {
+          copyTaskTable(mainsheet,mySheet);
+          mainsheet.getRange('B6').setValue(csvArray[i][0]);
+          mySheet.getRange(9,taskCol)
+            .setValue(csvArray[i][csvArrayTodayIndex])
+            .setFontColor("#0000FF");
+          mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
 
-    
+        }else{
+          mySheet.getRange(taskRow,taskCol)
+            .setValue(csvArray[i][csvArrayTodayIndex])
+            .setFontColor("#0000FF");
+
+        };
+        // console.log(taskRow,taskCol);
+        // console.log(csvArray[i][0]);
+        // console.log(csvArray[i][csvArrayTodayIndex]);
+      }
+      // console.log("ループ完了");
+      // copyTaskTable(mainsheet,mySheet);
+      // mainsheet.getRange('B6').setValue('123');
+      // console.log(todayTaskTimeList);
+    // try {
+
+    // }catch(e){
+    //   console.log(e);
+    //   Browser.msgBox(e.message, Browser.Buttons.OK_CANCEL);
+    // }
 
 
+
+
+
+
+    // SpreadsheetApp.getActiveSpreadsheet().getSheetByName(myName[0]).getRange('2:3').shiftRowGroupDepth(1);
+    // SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getRange('2:3').shiftRowGroupDepth(1);
+    // .getRange('2:3').shiftRowGroupDepth(1);
     
 
 
@@ -167,8 +212,11 @@ function uploadFileToDrive(base64Data,fileName) {
     // // createDailog(body)
 
     // return file.getName();
-  } catch (f) {
+  } catch (e) {
     // return f.toString();
+    console.log(e);
+    createError(e.message);
+    // Browser.msgBox(e.message, Browser.Buttons.OK_CANCEL);
   }
 }
 
@@ -187,7 +235,24 @@ function csvInput() {
 
   var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
   .setWidth(700)
-  .setHeight(50);
+  // .setHeight(50);
+  .setHeight(200);
   SpreadsheetApp.getUi().showModelessDialog(html, title);
 
 }
+
+
+// createError(body);
+// function createError(body) {
+//   let title = 'エラー';
+//   var output = HtmlService.createTemplateFromFile('errorDailog');
+//   output.body = body;
+//   var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
+//     .setWidth(533)
+//     .setHeight(300);//16：9の比率に設定
+//   SpreadsheetApp.getUi().showModelessDialog(html, title);
+// }
+
+
+
+

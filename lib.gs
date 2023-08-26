@@ -1,12 +1,25 @@
-function createError(body){
-  var htmlOutput = HtmlService
-      .createHtmlOutput(body)
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-      .setWidth(533)
-      .setHeight(300);//16：9の比率に設定
-  SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'エラー');
-  //showModelessDialog()でも可
+// function createError(body){
+//   var htmlOutput = HtmlService
+//       .createHtmlOutput(body)
+//       .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+//       .setWidth(533)
+//       .setHeight(300);//16：9の比率に設定
+//   SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'エラー');
+//   //showModelessDialog()でも可
+// }
+function createError(body) {
+  let title = 'エラー';
+  var output = HtmlService.createTemplateFromFile('Dailog');
+  output.body = body;
+  output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
+  var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .setWidth(533)
+    .setHeight(300);//16：9の比率に設定
+  SpreadsheetApp.getUi().showModelessDialog(html, title);//showModelessDialog()でも可
 }
+
+
+
 
 function createDailog(body){
   var htmlOutput = HtmlService
@@ -198,11 +211,11 @@ function inputPlanCellsNexst() {
   //行を追加
   mainSheet2.insertRowsAfter(lastRow, 17);
   const copySheet = mainsheet.getSheetByName("コピー元");
-  const copysheetRange = copySheet.getRange("A1:PN18")
+  const copysheetRange = copySheet.getRange("A1:PN18");
   //コピー対象のセル範囲のデータを貼り付け先のセルにコピーする
   const firstRngen = valuelastRow+1;
   const secondRngen = valuelastRow+18;
-  console.log('A'+firstRngen+':PA'+secondRngen);
+  // console.log('A'+firstRngen+':PA'+secondRngen);
   copysheetRange.copyTo(mainSheet2.getRange('A'+firstRngen+':PN'+secondRngen), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
   const thirdRange = valuelastRow + 6;
   const uniqueIdRange = valuelastRow + 11;
