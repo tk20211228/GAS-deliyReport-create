@@ -3,6 +3,7 @@ function onOpen(){
       meinUI
         .createMenu('日報')
            .addItem('日報作成', 'createReport')
+           .addItem('CSV出力 Beta Ver1.0', 'csvOutput')//csv.gsで管理
            .addItem('日報作成-新フォーマット※作成中', 'newCreateReport')
           //  .addItem('開始日報作成','b')
         .addToUi();
@@ -10,8 +11,8 @@ function onOpen(){
         .createMenu('進捗入力')
         // .addItem('「進捗入力（空）を作成」', 'c')//マクロ.gsで管理
         // .addItem('全体把握から進捗入力を作成', 'inputPlanCells')//lib.gsで管理
-        .addItem('全体把握から進捗入力を作成(高速版)', 'inputPlanCellsNexst')//lib.gsで管理
-        .addItem('CSV入力※作成中', 'csvInput')//lib.gsで管理
+        .addItem('全体把握から進捗を作成', 'inputPlanCellsNexst')//lib.gsで管理
+        .addItem('CSV入力(各自のシートに入力) Beta Ver1.0', 'csvInput')//csv.gsで管理
         .addToUi();
       meinUI
         .createMenu('メンテナンス') 

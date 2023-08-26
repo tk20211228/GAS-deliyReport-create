@@ -1,12 +1,25 @@
-function createError(body){
-  var htmlOutput = HtmlService
-      .createHtmlOutput(body)
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-      .setWidth(533)
-      .setHeight(300);//16：9の比率に設定
-  SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'エラー');
-  //showModelessDialog()でも可
+// function createError(body){
+//   var htmlOutput = HtmlService
+//       .createHtmlOutput(body)
+//       .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+//       .setWidth(533)
+//       .setHeight(300);//16：9の比率に設定
+//   SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'エラー');
+//   //showModelessDialog()でも可
+// }
+function createError(body) {
+  let title = 'エラー';
+  var output = HtmlService.createTemplateFromFile('Dailog');
+  output.body = body;
+  output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
+  var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .setWidth(533)
+    .setHeight(300);//16：9の比率に設定
+  SpreadsheetApp.getUi().showModelessDialog(html, title);//showModelessDialog()でも可
 }
+
+
+
 
 function createDailog(body){
   var htmlOutput = HtmlService
@@ -93,16 +106,16 @@ function getMyname(){
   if(!familyName){
     var name = myNameSerach();
     var familyName = name[0];
-    console.log('確認：'+familyName);
+    // console.log('確認：'+familyName);
 
     var fullName = name[1];
-    console.log('確認：'+fullName);
+    // console.log('確認：'+fullName);
     if(familyName != '（姓）'){
       setProp(userEmail,familyName);
       setProp(familyName,fullName);
     }
   }
-  console.log(name);
+  // console.log(name);
   return [familyName,fullName];
 
 }
@@ -137,9 +150,9 @@ function inputPlanCells() {
   const mainSheet2 = mainsheet.getSheetByName(tasklist[0][3]);
   console.log(mainSheet2.getRange(1,1).getValue());
   const valuelastRow = mainSheet2.getLastRow();
-  console.log(valuelastRow);
+  // console.log(valuelastRow);
   const lastRow = mainSheet2.getMaxRows();
-  console.log(lastRow);
+  // console.log(lastRow);
   //行を追加
   mainSheet2.insertRowsAfter(lastRow, 17);
   const copySheet = mainsheet.getSheetByName("コピー元");
@@ -169,9 +182,9 @@ function inputPlanCellsNexst() {
   console.log(choicePlaceRow+","+choicePlaceColmmon);
   const mainsheet1 = SpreadsheetApp.getActiveSheet();
   const tasklist = mainsheet1.getRange(choicePlaceRow,choicePlaceColmmon-2,1,4).getValues();
-  console.log(tasklist);
+  // console.log(tasklist);
   const uniqueId =  tasklist[0][3] + Utilities.formatDate(new Date(), "Asia/Tokyo", "yyyy/MM/dd/HH:mm:ss");
-  console.log(uniqueId);
+  // console.log(uniqueId);
 
   mainsheet1.getRange(choicePlaceRow,choicePlaceColmmon+12,4,1).setValues([[uniqueId],[uniqueId],[uniqueId],[uniqueId]]);
   const sheetlist = SpreadsheetApp.getActive().getSheets();
@@ -181,8 +194,8 @@ function inputPlanCellsNexst() {
     sheetNamelist[i]= sheetName;
 
   }
-  console.log(sheetNamelist);
-  console.log(tasklist[0][3]);
+  // console.log(sheetNamelist);
+  // console.log(tasklist[0][3]);
   const sheetJudgement = sheetNamelist.includes(tasklist[0][3]);
   console.log(sheetJudgement);
   if(!sheetJudgement){
@@ -192,17 +205,17 @@ function inputPlanCellsNexst() {
   const mainSheet2 = mainsheet.getSheetByName(tasklist[0][3]);
   console.log(mainSheet2.getRange(1,1).getValue());
   const valuelastRow = mainSheet2.getLastRow();
-  console.log(valuelastRow);
+  // console.log(valuelastRow);
   const lastRow = mainSheet2.getMaxRows();
-  console.log(lastRow);
+  // console.log(lastRow);
   //行を追加
   mainSheet2.insertRowsAfter(lastRow, 17);
-  const copySheet = mainsheet.getSheetByName("コピー元(速)");
-  const copysheetRange = copySheet.getRange("A1:PN18")
+  const copySheet = mainsheet.getSheetByName("コピー元");
+  const copysheetRange = copySheet.getRange("A1:PN18");
   //コピー対象のセル範囲のデータを貼り付け先のセルにコピーする
   const firstRngen = valuelastRow+1;
   const secondRngen = valuelastRow+18;
-  console.log('A'+firstRngen+':PA'+secondRngen);
+  // console.log('A'+firstRngen+':PA'+secondRngen);
   copysheetRange.copyTo(mainSheet2.getRange('A'+firstRngen+':PN'+secondRngen), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
   const thirdRange = valuelastRow + 6;
   const uniqueIdRange = valuelastRow + 11;
