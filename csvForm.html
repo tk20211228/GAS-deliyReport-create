@@ -1,49 +1,37 @@
 <html>
   <head>
     <base target="_top">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/1.0.30/encoding.min.js"></script>
+    <?!= inputLib ?>
   </head>
   <body>
     <div class="input-group">
       <input type="file" class="form-control" id="files" aria-describedby="inputGroupFileAddon" aria-label="Upload" name="files[]" accept=".csv,text/csv">
-      <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon">実行</button>
+      <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon">読み込み</button>
     </div>
     <table class="table table-hover mt-2" id="taskTable">
         <colgroup>
             <col class="col-1">
-            <col class="col-10">
+            <col class="col-8">
             <col class="col-1">
+            <col class="col-2">
         </colgroup>
         <thead>
           <tr>
             <th scope="col">No.</th>
             <th scope="col">タスク名</th>
             <th scope="col">工数</th>
+            <th scope="col">進捗表</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="col">1</th>
-            <th scope="col">タスク1</th>
-            <th scope="col">0.25</th>
-          </tr>
-          <tr>
-            <th scope="col">2</th>
-            <th scope="col">タスク2</th>
-            <th scope="col">0.5</th>
-          </tr>
-          <tr>
-            <th scope="col">3</th>
-            <th scope="col">タスク3</th>
-            <th scope="col">1</th>
-          </tr>
         </tbody>
     </table>
     <!-- <div class="container mt-2">
     </div> -->
     <div class="d-flex justify-content-end"> <!-- このdivを追加 -->
-      <button type="button" class="btn btn-outline-secondary mt-2" onclick="google.script.host.close()">閉じる</button>
+      <button type="button" class="btn btn-outline-primary mx-2" id="createReport">日報作成</button>
+      <button type="button" class="btn btn-outline-success mx-2" id="createProgress">進捗表を新規作成</button>
+      <button type="button" class="btn btn-outline-secondary mx-2"id="inputGroupFileAddon" onclick="google.script.host.close()">閉じる</button>
     </div>
 
     <!-- Spinnerを追加 -->
@@ -55,7 +43,6 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
     <script>
     function formatDateToISO(date) {
@@ -88,11 +75,11 @@
         return result;
     }
 
+    const buttonIds = ['inputGroupFileAddon', 'createReport', 'createProgress'];
     // ファイルの選択状態をチェックしてボタンの活性/非活性を制御する関数
     function checkFileSelection() {
         var fileInput = document.getElementById('files');
         var btn = document.getElementById('inputGroupFileAddon');
-        
         if (fileInput.files.length === 0) {
             btn.disabled = true;
         } else {
@@ -108,7 +95,10 @@
     // テーブル内の工数を合計する関数
     function sumHours() {
         let total = 0;
-        const hoursElements = document.querySelectorAll("#taskTable tbody td:last-child");
+        // :first-child は子要素の一番最初に適応
+        // :last-child は子要素の一番最後に適応
+        // :nth-last-child(n) は子要素の最後からn番目に適応
+        const hoursElements = document.querySelectorAll("#taskTable tbody td:nth-last-child(2)");
         
         hoursElements.forEach(element => {
             total += parseFloat(element.innerText);
@@ -129,14 +119,65 @@
         tbody.appendChild(newRow);
     }
 
+    
+    function createTableBody(taskList){
+        const tableBody = document.querySelector('#taskTable tbody');
+        tableBody.innerHTML = '';
+        taskList.forEach((task, index) => {
+            const row = document.createElement('tr');
+            // インデックスを基に行番号を作成
+            const th = document.createElement('th');
+            th.setAttribute('scope', 'row');
+            th.innerText = index + 1;
+
+            // 1つ目の要素をセルに追加
+            const tdName = document.createElement('td');
+            tdName.innerText = task[0];
+
+            // 2つ目の要素をセルに追加
+            const tdTime = document.createElement('td');
+            tdTime.innerText = task[1];
+
+            // 3つ目の要素をセルに追加
+            const tdTable = document.createElement('td');
+            if(task[2] == true){
+              tdTable.innerHTML = '<i class="bi bi-check-circle" style="color: #20c997;"></i>';
+
+            }else{
+              tdTable.innerHTML = '<i class="bi bi-dash-lg"></i>';
+            }
+
+            // セルを行に追加
+            row.appendChild(th);
+            row.appendChild(tdName);
+            row.appendChild(tdTime);
+            row.appendChild(tdTable);
+
+            // 行をテーブルに追加
+            tableBody.appendChild(row);
+        });
+    }
+
+    // DOMが完全に読み込まれた後に実行されるコード
+    let taskList = [["-",0.00,false], ["-",0.00,false], ["-",0.00,false], ["-",0.00,false]];
+    document.addEventListener('DOMContentLoaded', function() {
+      // let taskList = [["-",0.00,false], ["-",0.00,false], ["-",0.00,false], ["-",0.00,false]];
+      createTableBody(taskList);
+      buttonIds.forEach(id => {
+          const btn = document.getElementById(id);
+          btn.disabled = true; // ボタンを無効化
+      });
+    });
+
     document.getElementById('inputGroupFileAddon').addEventListener('click', function() {
       // console.log("TEST");
       const csvType = '<?= csvType ?>';
-      console.log(csvType);
+      // console.log(csvType);
       
-      var btn = document.getElementById('inputGroupFileAddon');
-      btn.disabled = true; // ボタンを無効化
-
+      buttonIds.forEach(id => {
+          const btn = document.getElementById(id);
+          btn.disabled = true; // ボタンを無効化
+      });
       var fileInput = document.getElementById('files');
       var file = fileInput.files[0];
 
@@ -147,10 +188,6 @@
 
       var reader = new FileReader();
       reader.onloadend = function(e) {
-
-
-
-
         var content = reader.result;
 
         // base64部分のみを取得
@@ -167,81 +204,86 @@
 
         var csvArraryData = csvToArray(charArray);
         let index = csvArraryData[0].indexOf(todayToISO);
-        let taskList = [];
+        taskList.length = 0; // taskListを空にする
         for(i=1;i<csvArraryData.length;i++){
           if(!csvArraryData[i][index]) continue;
           taskList.push([csvArraryData[i][0],csvArraryData[i][index]]);
         }
-        console.log(index);
-        console.log(taskList);
-        
-        // // JavaScriptで配列を取得
-        // // const taskList = ["タスクA", "タスクB", "タスクC", "タスクD", "タスクE", "タスクF", "タスクG"];
-        // // ul要素を取得
-        // const ulElement = document.querySelector(".list-group");
-        //         // 配列の内容を基にli要素を生成
-        // taskList.forEach(task => {
-        //   const liElement = document.createElement("li");
-        //   liElement.className = "list-group-item";
-        //   liElement.textContent = task;
-        //   ulElement.appendChild(liElement);
-        // });
-        const tableBody = document.querySelector('#taskTable tbody');
-        tableBody.innerHTML = '';
-
-        taskList.forEach((task, index) => {
-            const row = document.createElement('tr');
-            // インデックスを基に行番号を作成
-            const th = document.createElement('th');
-            th.setAttribute('scope', 'row');
-            th.innerText = index + 1;
-
-            // 1つ目の要素をセルに追加
-            const tdName = document.createElement('td');
-            tdName.innerText = task[0];
-
-            // 2つ目の要素をセルに追加
-            const tdTime = document.createElement('td');
-            tdTime.innerText = task[1];
-
-            // セルを行に追加
-            row.appendChild(th);
-            row.appendChild(tdName);
-            row.appendChild(tdTime);
-
-            // 行をテーブルに追加
-            tableBody.appendChild(row);
-        });
-
+        createTableBody(taskList);
+  
         // 関数を呼び出して合計行を追加
-        addTotalRow();
-
-        // console.log("csvArraryData",csvArraryData);
-        // console.log(fileName);
+        // addTotalRow();
 
         // Spinnerを表示
         document.getElementById('overlay').style.display = 'block';
 
         if(csvType === 'csvInput'){
-          google.script.run.withSuccessHandler(function (){
-            // 処理が完了したら、Spinnerを非表示にし、画面を閉じる
-            // google.script.host.close();
+          google.script.run.withSuccessHandler(function (res){
+            taskList = res;
+            createTableBody(taskList);
+            addTotalRow();
+            console.log("taskList123",taskList);
             // await new Promise(r => setTimeout(r, 10000)); // 3秒間のスリープ
             document.getElementById('overlay').style.display = 'none';
-            btn.disabled = false; // ボタンを有効化
+            buttonIds.forEach(id => {
+                const btn = document.getElementById(id);
+                btn.disabled = false; 
+            });
+
             // google.script.host.close();
-          }).uploadFileToDrive(content,fileName);
+          }).uploadFile({content,fileName,taskList});
         };
 
         if(csvType === 'csvOutput'){
           google.script.run.withSuccessHandler(function (){
             document.getElementById('overlay').style.display = 'none';
-            btn.disabled = false; // ボタンを有効化
+            buttonIds.forEach(id => {
+                const btn = document.getElementById(id);
+                btn.disabled = false; 
+            });
           }).csvCreateReport({taskList});
         };     
       }
       reader.readAsDataURL(file);
     });
+
+    document.getElementById('createReport').addEventListener('click', function() {
+      console.log('createReport',taskList);
+      buttonIds.forEach(id => {
+          const btn = document.getElementById(id);
+          btn.disabled = true; // ボタンを無効化
+      });
+      // Spinnerを表示
+      document.getElementById('overlay').style.display = 'block';
+          google.script.run.withSuccessHandler(function (){
+            document.getElementById('overlay').style.display = 'none';
+            buttonIds.forEach(id => {
+                const btn = document.getElementById(id);
+                btn.disabled = false; 
+            });
+          }).csvCreateReport({taskList});
+    });
+
+    document.getElementById('createProgress').addEventListener('click', function() {
+      console.log('createReport',taskList);
+      buttonIds.forEach(id => {
+          const btn = document.getElementById(id);
+          btn.disabled = true; // ボタンを無効化
+      });
+      // Spinnerを表示
+      document.getElementById('overlay').style.display = 'block';
+          google.script.run.withSuccessHandler(function (res){
+            taskList = res;
+            createTableBody(taskList);
+            addTotalRow();
+            document.getElementById('overlay').style.display = 'none';
+            buttonIds.forEach(id => {
+                const btn = document.getElementById(id);
+                btn.disabled = false; 
+            });
+          }).csvCreateProgress({taskList});
+    });
+
     </script>
 
   </body>

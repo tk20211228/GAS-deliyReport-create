@@ -13,13 +13,13 @@
             <div class="col-6 mt-2 d-flex align-items-center">
               <label class="col-sm-2 col-form-label">差出人</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="myEmail" value="<?= bodyItem.userEmail ?>">
+                <input type="text" class="form-control" id="myEmail" value="<?= bodyItem.userEmail ?>" readonly>
               </div>
             </div>
             <div class="col-6 mt-2 d-flex align-items-center">
               <label class="col-sm-2 col-form-label">宛先</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="destination" value="<?= bodyItem.destination ?>">
+                <input type="text" class="form-control" id="destination" value="<?= bodyItem.destination ?>" readonly>
               </div>
             </div>
             <div class="col-6 mt-2 d-flex align-items-center">
@@ -30,10 +30,11 @@
             </div>
             <div class="col-12 mt-2">
               <textarea class="form-control form-control-lg" id="report" style="height:570px"><?= bodyItem.reportBody ?></textarea>
-              <button id="send_button" type="button" class="btn btn-outline-primary m-2" @click="createGmail"> 
+              <button id="createGmail" type="button" class="btn btn-outline-primary m-2"> 
                 Gmailの下書きに出力する
               </button>
               <button type="button" class="btn btn-outline-success m-2" v-on:click="copy">テキストを全てコピーする</button>
+
               <button type="button" class="btn btn-outline-secondary m-2" onclick="google.script.host.close()">閉じる</button>
             </div>
           </form>
@@ -41,8 +42,16 @@
      </div>
     </div>
     <script>
- 
-  </script>
+      document.getElementById('createGmail').addEventListener('click',function(){
+        const body    = document.getElementsByTagName("textarea")[0].value;
+        const subject = document.getElementById('subject').value;
+        const to      = document.getElementById('destination').value;
+        // console.log(body,subject,to);
+        google.script.run.withSuccessHandler(function(){
+          google.script.host.close();
+          }).createGmail(to,subject,body);
+      })
+    </script>
 
     </div>
   </body>

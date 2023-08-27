@@ -231,12 +231,13 @@ function csvCreateBody({myName,taskList}){
     const reportBody = createEmailBody({taskBodyList,myName});
 
     const userEmail = Session.getActiveUser().getEmail();
-    const destination = 'ml-mdm-dev@isb.co.jp';
+    const destination = getProp('destination');
     
     return {reportBody,destination,userEmail,subject};
 }
 
 function csvCreateReport({taskList}){
+  console.log(taskList);
   try {
     const myName = getMyname();
     // console.log(myName)

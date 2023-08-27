@@ -16,8 +16,8 @@ function onOpen(){
         .addToUi();
       meinUI
         .createMenu('CSV入力/出力')
-          .addItem('CSV出力 Beta Ver1.0', 'csvOutput')//csv.gsで管理
-          .addItem('CSV入力 Beta Ver1.0', 'csvInput')//csv.gsで管理
+          // .addItem('CSV出力 Beta Ver1.0', 'csvOutput')//csv.gsで管理
+          .addItem('CSV入力/出力 Beta Ver1.0', 'csvInput')//csv.gsで管理
           .addToUi();
       meinUI
         .createMenu('メンテナンス') 

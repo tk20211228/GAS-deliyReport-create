@@ -82,9 +82,10 @@ function createBody(myName){
       dayDete[b] = deta;
     }
   }
+  const destination = getProp('destination');
 
   let bodyItem = {
-    destination                :['ml-mdm-dev@isb.co.jp','宛先'],
+    destination                :[destination,'宛先'],
     subject                    :[subject,'件名'],
     familyName                 :[myName[0],'担当者'],//
     taskName                   :[selectAllPlanVlales[1][0],'タスク名'],// 

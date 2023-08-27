@@ -1,3 +1,48 @@
+function csvCreateProgress({taskList}){
+  try{
+    const mainsheet = SpreadsheetApp.getActiveSpreadsheet();
+    const myName = getMyname();
+    const mySheet = mainsheet.getSheetByName(myName[0]);
+    const data = new Date();
+    const today = Utilities.formatDate(data, "Asia/Tokyo", "yyyy-MM-dd");
+    const mySheetdayList = mySheet.getRange("5:5").getValues().flat();
+    // 配列を更新して、Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換
+    const mySheetdayListFormattedArray = mySheetdayList.map(item => {
+        if (item instanceof Date) {
+            return formatDate(item);
+        }
+        return item;
+    });
+    let taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
+    // const csvArrayTodayIndex = csvArray[0].indexOf(today);
+    // console.log(csvArrayTodayIndex);
+    // if (csvArrayTodayIndex === -1) {
+    //     throw {
+    //         customError: "Today's date was not found in the CSV array.",
+    //         systemError: null
+    //     };
+    // };
+    for(n=0;n<taskList.length;n++){
+      if(taskList[n][2] === false){
+        copyTaskTable(mainsheet,mySheet);
+        mainsheet.getRange('B6').setValue(taskList[n][0]);
+        mySheet.getRange(9,taskCol)
+          .setValue(taskList[n][1])
+          .setFontColor("#0000FF");
+        taskList[n][2] = true ;
+      };
+    };
+  }catch(e){
+    console.log("csvCreateBody123",e);
+    // eがオブジェクトの場合、カスタムエラーとシステムエラーを取得する
+    const customErrorMessage = e.customError || '';
+    const systemErrorMessage = e.systemError || e.message || '';
+    createError(customErrorMessage, systemErrorMessage);
+  }finally{
+    return taskList;
+
+  }
+}
 
 function CSVStringToArray(strData) {
     var rows = strData.trim().split("\n");
@@ -39,12 +84,14 @@ function copyTaskTable(mainsheet,mySheet){
   // console.log("コピー完了");
 }
 
-function uploadFileToDrive(base64Data,fileName) {
+function uploadFile({content,fileName,taskList}) {
+  
   try {
-    var date = base64Data.split(",")[1];
+    console.log(taskList);
+    var base64Data = content.split(",")[1];
     // console.log("csvArray",csvArray);
     // Base64データをバイト配列にデコード
-    var decodedBytes = Utilities.base64Decode(date);
+    var decodedBytes = Utilities.base64Decode(base64Data);
 
     // バイト配列を文字列に変換
     var csvString = Utilities.newBlob(decodedBytes).getDataAsString('Shift_JIS');
@@ -54,13 +101,13 @@ function uploadFileToDrive(base64Data,fileName) {
 
     // console.log(csvArray);
 
-    var splitBase = base64Data.split(','),
-        type = splitBase[0].split(';')[0].replace('data:', ''),
-        byteCharacters = Utilities.base64Decode(splitBase[1]),
-        ss = Utilities.newBlob(byteCharacters, type);
-    ss.setName(fileName);
+    // var splitBase = content.split(','),
+    //     type = splitBase[0].split(';')[0].replace('data:', ''),
+    //     byteCharacters = Utilities.base64Decode(splitBase[1]),
+    //     ss = Utilities.newBlob(byteCharacters, type);
+    // ss.setName(fileName);
 
-    var dropbox = "redmine_月間工数"; // フォルダ名
+    // var dropbox = "redmine_月間工数"; // フォルダ名
     const myName = getMyname();
     // console.log(myName)
     if(!myName[1]) {
@@ -158,14 +205,25 @@ function uploadFileToDrive(base64Data,fileName) {
           taskCol
           ]);
         if(taskRow == 3) {
-          copyTaskTable(mainsheet,mySheet);
-          mainsheet.getRange('B6').setValue(csvArray[i][0]);
-          mySheet.getRange(9,taskCol)
-            .setValue(csvArray[i][csvArrayTodayIndex])
-            .setFontColor("#0000FF");
-          mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
-
+          // copyTaskTable(mainsheet,mySheet);
+          // mainsheet.getRange('B6').setValue(csvArray[i][0]);
+          // mySheet.getRange(9,taskCol)
+          //   .setValue(csvArray[i][csvArrayTodayIndex])
+          //   .setFontColor("#0000FF");
+          // mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
+          for(n=0;n<taskList.length;n++){
+            if(taskList[n][2] === undefined ){
+              taskList[n].push(false);
+              break;
+            };
+          };
         }else{
+          for(n=0;n<taskList.length;n++){
+            if(taskList[n][2] === undefined ){
+              taskList[n].push(true);
+              break;
+            }
+          };
           mySheet.getRange(taskRow,taskCol)
             .setValue(csvArray[i][csvArrayTodayIndex])
             .setFontColor("#0000FF");
@@ -186,18 +244,10 @@ function uploadFileToDrive(base64Data,fileName) {
     //   Browser.msgBox(e.message, Browser.Buttons.OK_CANCEL);
     // }
 
-
-
-
-
-
     // SpreadsheetApp.getActiveSpreadsheet().getSheetByName(myName[0]).getRange('2:3').shiftRowGroupDepth(1);
     // SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getRange('2:3').shiftRowGroupDepth(1);
     // .getRange('2:3').shiftRowGroupDepth(1);
     
-
-
-
     // const body = `
     // <p>成功</p>
     // <p>${csvArray[1][0]}</p>
@@ -209,6 +259,10 @@ function uploadFileToDrive(base64Data,fileName) {
     // // createDailog(body)
 
     // return file.getName();
+
+    console.log("uploadFileToDrive",taskList)
+
+    return taskList;
   } catch (e) {
     // return f.toString();
     console.log(e);
@@ -222,27 +276,24 @@ function csvInput() {
   // const myName = getMyname();
   // console.log(myName[0])
   var output = HtmlService.createTemplateFromFile('csvForm');
+  output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
   output.csvType = "csvInput"; 
-  // output.bodyItemJSON = JSON.stringify(bodyItem);
-  // output.bodyItem = bodyItem;
-  // output.inputsub = title;
-  // output.inputCss = HtmlService.createHtmlOutputFromFile('css').getContent();
-  // output.inputJs = HtmlService.createHtmlOutputFromFile('js').getContent();
   var html = output.evaluate()
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-    .setWidth(700)
-    .setHeight(290);
+    .setWidth(750)
+    .setHeight(325);
   SpreadsheetApp.getUi().showModelessDialog(html, title);
 }
 
 function csvOutput() {
   let title = 'CSV出力';
   var output = HtmlService.createTemplateFromFile('csvForm');
+  output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
   output.csvType = "csvOutput"; 
   var html = output.evaluate()
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-    .setWidth(700)
-    .setHeight(290);
+    .setWidth(750)
+    .setHeight(325);
   SpreadsheetApp.getUi().showModelessDialog(html, title);
 }
 
