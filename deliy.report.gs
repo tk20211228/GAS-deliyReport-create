@@ -152,6 +152,7 @@ function createReport(){
   ///メールの内容を作成
   try{
       var bodyItem = createBody(myName);
+      console.log(bodyItem);
     }catch(e){
       const body = '<p>開始予定,完了予定の表示形式に問題がある可能性があります。</p>';
       const error = e.message;
