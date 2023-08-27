@@ -37,10 +37,7 @@ function copyTaskTable(mainsheet,mySheet){
     const copysheetRange = copySheet.getRange("A1:PN18");
     copysheetRange.copyTo(mySheet.getRange("A1:PN18"), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
   // console.log("コピー完了");
-
 }
-
-
 
 function uploadFileToDrive(base64Data,fileName) {
   try {
@@ -220,39 +217,34 @@ function uploadFileToDrive(base64Data,fileName) {
   }
 }
 
-
 function csvInput() {
   let title = 'CSV入力';
-
-    const myName = getMyname();
-    console.log(myName[0])
-  var output = HtmlService.createTemplateFromFile('uploadForm');
+  // const myName = getMyname();
+  // console.log(myName[0])
+  var output = HtmlService.createTemplateFromFile('csvForm');
+  output.csvType = "csvInput"; 
   // output.bodyItemJSON = JSON.stringify(bodyItem);
   // output.bodyItem = bodyItem;
   // output.inputsub = title;
   // output.inputCss = HtmlService.createHtmlOutputFromFile('css').getContent();
   // output.inputJs = HtmlService.createHtmlOutputFromFile('js').getContent();
-
-  var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
-  .setWidth(700)
-  // .setHeight(50);
-  .setHeight(200);
+  var html = output.evaluate()
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .setWidth(700)
+    .setHeight(290);
   SpreadsheetApp.getUi().showModelessDialog(html, title);
-
 }
 
-
-// createError(body);
-// function createError(body) {
-//   let title = 'エラー';
-//   var output = HtmlService.createTemplateFromFile('errorDailog');
-//   output.body = body;
-//   var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
-//     .setWidth(533)
-//     .setHeight(300);//16：9の比率に設定
-//   SpreadsheetApp.getUi().showModelessDialog(html, title);
-// }
-
+function csvOutput() {
+  let title = 'CSV出力';
+  var output = HtmlService.createTemplateFromFile('csvForm');
+  output.csvType = "csvOutput"; 
+  var html = output.evaluate()
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .setWidth(700)
+    .setHeight(290);
+  SpreadsheetApp.getUi().showModelessDialog(html, title);
+}
 
 
 

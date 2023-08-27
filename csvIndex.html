@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <base target="_top">
+    <?!= inputLib ?>
+  </head>
+  <body>
+    <div class="m-2" style="background: #edf0ff;">
+       <div class="container-fluid">
+        <div class="m-2 row d-flex">
+          <form>
+            <div class="col-6 mt-2 d-flex align-items-center">
+              <label class="col-sm-2 col-form-label">差出人</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="myEmail" value="<?= bodyItem.userEmail ?>">
+              </div>
+            </div>
+            <div class="col-6 mt-2 d-flex align-items-center">
+              <label class="col-sm-2 col-form-label">宛先</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="destination" value="<?= bodyItem.destination ?>">
+              </div>
+            </div>
+            <div class="col-6 mt-2 d-flex align-items-center">
+              <label class="col-sm-2 col-form-label">件名</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="subject" value="<?= bodyItem.subject ?>">
+              </div>
+            </div>
+            <div class="col-12 mt-2">
+              <textarea class="form-control form-control-lg" id="report" style="height:570px"><?= bodyItem.reportBody ?></textarea>
+              <button id="send_button" type="button" class="btn btn-outline-primary m-2" @click="createGmail"> 
+                Gmailの下書きに出力する
+              </button>
+              <button type="button" class="btn btn-outline-success m-2" v-on:click="copy">テキストを全てコピーする</button>
+              <button type="button" class="btn btn-outline-secondary m-2" onclick="google.script.host.close()">閉じる</button>
+            </div>
+          </form>
+       </div>
+     </div>
+    </div>
+    <script>
+ 
+  </script>
+
+    </div>
+  </body>
+  
+</html>

@@ -27,7 +27,8 @@
               </div>
             </div>
             <hr>
-            <p><?= body ?></p> <!-- エラーメッセージを表示 -->
+            <p><?= error ?></p> <!-- エラーメッセージを表示 -->
+            <?!= body ?>
         </div>
         <div class="d-flex justify-content-end"> <!-- このdivを追加 -->
             <button type="button" class="btn btn-outline-secondary" onclick="google.script.host.close()">閉じる</button>

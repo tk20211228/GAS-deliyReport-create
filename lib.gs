@@ -1,25 +1,14 @@
-// function createError(body){
-//   var htmlOutput = HtmlService
-//       .createHtmlOutput(body)
-//       .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-//       .setWidth(533)
-//       .setHeight(300);//16：9の比率に設定
-//   SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'エラー');
-//   //showModelessDialog()でも可
-// }
-function createError(body) {
+function createError(body,error) {
   let title = 'エラー';
   var output = HtmlService.createTemplateFromFile('Dailog');
   output.body = body;
+  output.error = error;
   output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
   var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .setWidth(533)
     .setHeight(300);//16：9の比率に設定
   SpreadsheetApp.getUi().showModelessDialog(html, title);//showModelessDialog()でも可
 }
-
-
-
 
 function createDailog(body){
   var htmlOutput = HtmlService
