@@ -82,7 +82,7 @@ function createBody(myName){
       dayDete[b] = deta;
     }
   }
-  const destination = getProp('destination');
+  const destination = getProp('destination-sdm');
 
   let bodyItem = {
     destination                :[destination,'宛先'],

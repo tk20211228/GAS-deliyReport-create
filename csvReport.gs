@@ -38,7 +38,7 @@ function taskBody({activeSheet,taskRow,taskCol}){
     // console.log(dayDete.length);
     for(b=0;b<dayDete.length;++b){
       if(dayDete[b]){
-        var deta = Utilities.formatDate(dayDete[b], "Asia/Tokyo", "MM/dd");
+        var deta = Utilities.formatDate(dayDete[b], "Asia/Tokyo", "yyyy/MM/dd");
         dayDete[b] = deta;
       }else{
         var deta = 'なし';
@@ -119,7 +119,7 @@ function taskBody({activeSheet,taskRow,taskCol}){
 }
 
 function createEmailBody({taskBodyList,myName}) {
-  console.log('taskBodyList',taskBodyList);
+  // console.log('taskBodyList',taskBodyList);
   let todayPlanAll = '';
   let todayActualAll = '';
   let tomorrowPlanAll = '';
@@ -128,9 +128,9 @@ function createEmailBody({taskBodyList,myName}) {
     todayActualAll += taskBodyList[i][1];
     tomorrowPlanAll += taskBodyList[i][2];
   }
-  console.log('todayPlanAll',todayPlanAll);
-  console.log('todayActualAll',todayActualAll);
-  console.log('tomorrowPlanAll',tomorrowPlanAll);
+  // console.log('todayPlanAll',todayPlanAll);
+  // console.log('todayActualAll',todayActualAll);
+  // console.log('tomorrowPlanAll',tomorrowPlanAll);
 
   return body = `
   各位
@@ -210,8 +210,9 @@ function csvCreateBody({myName,taskList}){
         return item;
     });
 
-    const taskCol = findDateIndex(formatDateToISO, mySheetdayListFormattedArray);
-    // console.log(taskCol);
+    const taskCol = findDateIndex(formatDateToISO, mySheetdayListFormattedArray) + 1 ;
+    console.log(formatDateToISO);
+    console.log(taskCol);
     if (taskCol === -1) {
       throw {
           customError: `「${formatDateToISO}」を、進捗「${myName[0]}」シートの”5:5”から見つけることができませんでした。`,
@@ -231,13 +232,13 @@ function csvCreateBody({myName,taskList}){
     const reportBody = createEmailBody({taskBodyList,myName});
 
     const userEmail = Session.getActiveUser().getEmail();
-    const destination = getProp('destination');
+    const destination = getProp('destination-sdm');
     
     return {reportBody,destination,userEmail,subject};
 }
 
 function csvCreateReport({taskList}){
-  console.log(taskList);
+  // console.log(taskList);
   try {
     const myName = getMyname();
     // console.log(myName)
