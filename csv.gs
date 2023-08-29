@@ -14,14 +14,6 @@ function csvCreateProgress({taskList}){
         return item;
     });
     let taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
-    // const csvArrayTodayIndex = csvArray[0].indexOf(today);
-    // console.log(csvArrayTodayIndex);
-    // if (csvArrayTodayIndex === -1) {
-    //     throw {
-    //         customError: "Today's date was not found in the CSV array.",
-    //         systemError: null
-    //     };
-    // };
     for(n=0;n<taskList.length;n++){
       if(taskList[n][2] === false){
         copyTaskTable(mainsheet,mySheet);
@@ -99,15 +91,6 @@ function uploadFile({content,fileName,taskList}) {
     // CSV文字列を配列に変換
     var csvArray = CSVStringToArray(csvString);
 
-    // console.log(csvArray);
-
-    // var splitBase = content.split(','),
-    //     type = splitBase[0].split(';')[0].replace('data:', ''),
-    //     byteCharacters = Utilities.base64Decode(splitBase[1]),
-    //     ss = Utilities.newBlob(byteCharacters, type);
-    // ss.setName(fileName);
-
-    // var dropbox = "redmine_月間工数"; // フォルダ名
     const myName = getMyname();
     // console.log(myName)
     if(!myName[1]) {
@@ -115,68 +98,17 @@ function uploadFile({content,fileName,taskList}) {
         createError(body);
         return
     }
-
-    // var subFolderName = myName[0]; // サブフォルダ名
-    // console.log(subFolderName)
-
-    // var folders = DriveApp.getFoldersByName(dropbox);
-    // フォルダがない場合はエラーをスロー
-    // var folder;
-    // if (folders.hasNext()) {
-    //   folder = folders.next();
-    // } else {
-    //   throw new Error("Folder not found");
-    // }
-
-    // サブフォルダを取得
-    // var subFolders = folder.getFoldersByName(subFolderName);
-    // var subFolder;
-    // console.log(subFolders.hasNext())
-    // if (subFolders.hasNext()) {
-    //   subFolder = subFolders.next();
-    // } else {
-    //   subFolder = folder.createFolder(myName[0]);
-    // }
-
-    // ファイルをサブフォルダに保存
-    // var file = subFolder.createFile(ss);
-
-    // 
-    // CSVファイルを文字列化
-    // const csvString = base64Data.getBlob().getDataAsString("Shift_JIS");
-    // var values = Utilities.parseCsv(csvString);
-
     // ダイヤログ確認
     const data = new Date();
     const today = Utilities.formatDate(data, "Asia/Tokyo", "yyyy-MM-dd");
-    // console.log(today);
-    // console.log(csvArray[0]);
-
     const csvArrayTodayIndex = csvArray[0].indexOf(today);
-    console.log(csvArrayTodayIndex);
     if (csvArrayTodayIndex === -1) {
       throw new Error("Today's date was not found in the CSV array.");
     };
-
-
     const todayTaskTimeList = [];
-
-
-    // console.log("mainsheet");
     const mainsheet = SpreadsheetApp.getActiveSpreadsheet();
-    // console.log(mainsheet);
-
     const mySheet = mainsheet.getSheetByName(myName[0]);
-    // console.log(mySheet);
-
     let mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
-    // if(existsSameValue(mySheetTaskList)){
-    //   Browser.msgBox("個人の進捗シートに、重複したタスク名の進捗管理表があります。");
-
-    // }
-    // console.log(mySheetTaskList);
-
-
     const mySheetdayList = mySheet.getRange("5:5").getValues().flat();
     // 配列を更新して、Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換
     const mySheetdayListFormattedArray = mySheetdayList.map(item => {
@@ -185,9 +117,7 @@ function uploadFile({content,fileName,taskList}) {
         }
         return item;
     });
-    // console.log(today);
-    // console.log(mySheetdayListFormattedArray);
-      // console.log("try開始");
+
       for(i=1;i<csvArray.length;i++){
         if(!csvArray[i][csvArrayTodayIndex]) continue;
         let taskRow = mySheetTaskList.indexOf(csvArray[i][0]) + 4 ;
@@ -205,12 +135,7 @@ function uploadFile({content,fileName,taskList}) {
           taskCol
           ]);
         if(taskRow == 3) {
-          // copyTaskTable(mainsheet,mySheet);
-          // mainsheet.getRange('B6').setValue(csvArray[i][0]);
-          // mySheet.getRange(9,taskCol)
-          //   .setValue(csvArray[i][csvArrayTodayIndex])
-          //   .setFontColor("#0000FF");
-          // mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
+
           for(n=0;n<taskList.length;n++){
             if(taskList[n][2] === undefined ){
               taskList[n].push(false);
@@ -227,54 +152,17 @@ function uploadFile({content,fileName,taskList}) {
           mySheet.getRange(taskRow,taskCol)
             .setValue(csvArray[i][csvArrayTodayIndex])
             .setFontColor("#0000FF");
-
         };
-        // console.log(taskRow,taskCol);
-        // console.log(csvArray[i][0]);
-        // console.log(csvArray[i][csvArrayTodayIndex]);
       }
-      // console.log("ループ完了");
-      // copyTaskTable(mainsheet,mySheet);
-      // mainsheet.getRange('B6').setValue('123');
-      // console.log(todayTaskTimeList);
-    // try {
-
-    // }catch(e){
-    //   console.log(e);
-    //   Browser.msgBox(e.message, Browser.Buttons.OK_CANCEL);
-    // }
-
-    // SpreadsheetApp.getActiveSpreadsheet().getSheetByName(myName[0]).getRange('2:3').shiftRowGroupDepth(1);
-    // SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getRange('2:3').shiftRowGroupDepth(1);
-    // .getRange('2:3').shiftRowGroupDepth(1);
-    
-    // const body = `
-    // <p>成功</p>
-    // <p>${csvArray[1][0]}</p>
-    // <p>${today}</p>
-    // <p>${csvArrayTodayIndex}</p>
-    // <p>${csvArray.length}</p>
-    // <p>${todayTaskTimeList.toString}</p>
-    // `; // 
-    // // createDailog(body)
-
-    // return file.getName();
-
-    console.log("uploadFileToDrive",taskList)
-
     return taskList;
   } catch (e) {
-    // return f.toString();
     console.log(e);
     createError(e.message);
-    // Browser.msgBox(e.message, Browser.Buttons.OK_CANCEL);
   }
 }
 
 function csvInput() {
   let title = 'CSV入力';
-  // const myName = getMyname();
-  // console.log(myName[0])
   var output = HtmlService.createTemplateFromFile('csvForm');
   output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
   output.csvType = "csvInput"; 
