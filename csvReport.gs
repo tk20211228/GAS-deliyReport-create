@@ -250,14 +250,6 @@ function csvCreateReport({taskList}){
     }
     var bodyItem = csvCreateBody({myName,taskList});
     console.log('bodyItem',bodyItem);
-    // if(!bodyItem){
-    //   const body = '<p>開始予定,完了予定の表示形式に問題がある可能性があります。</p>';
-    //   // カスタムエラーオブジェクトを投げる
-    //   throw {
-    //       customError: body,
-    //       systemError: null
-    //   };
-    // }
     let title = bodyItem.subject;
     // console.log("title",title);
     var output = HtmlService.createTemplateFromFile('csvIndex');
@@ -270,19 +262,14 @@ function csvCreateReport({taskList}){
     .setWidth(1100)
     .setHeight(790);
     SpreadsheetApp.getUi().showModelessDialog(html, title);
+    console.log('TEST');
 
   }catch(e){
-    console.log("csvCreateBody123",e);
+    // console.log("csvCreateBody123",e);
     // eがオブジェクトの場合、カスタムエラーとシステムエラーを取得する
     const customErrorMessage = e.customError || '';
     const systemErrorMessage = e.systemError || e.message || '';
     createError(customErrorMessage, systemErrorMessage);
   }
  
-  // ///メールの内容を作成
-  // try{
-  //   }catch(e){
-  //   }
-  // if(!bodyItem) return;
-
 };

@@ -1,40 +1,65 @@
+// 共通で使う関数や変数を先に定義する
+// Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換する関数
+function formatDate(date) {
+    return Utilities.formatDate(date, "Asia/Tokyo", "yyyy-MM-dd");
+}
+// 特定の日付のインデックスを取得するための関数
+function findDateIndex(dateString, arr) {
+    return arr.indexOf(dateString);
+}
+// エラーハンドリングの関数
+function handleErrors(e) {
+  // eがオブジェクトの場合、カスタムエラーとシステムエラーを取得する
+    const customErrorMessage = e.customError || '';
+    const systemErrorMessage = e.systemError || e.message || '';
+    createError(customErrorMessage, systemErrorMessage);
+}
+
+
+// 主要な処理を行う関数
 function csvCreateProgress({taskList}){
   try{
+    // 前準備と変数定義
     const mainsheet = SpreadsheetApp.getActiveSpreadsheet();
     const myName = getMyname();
     const mySheet = mainsheet.getSheetByName(myName[0]);
     const data = new Date();
     const today = Utilities.formatDate(data, "Asia/Tokyo", "yyyy-MM-dd");
-    const mySheetdayList = mySheet.getRange("5:5").getValues().flat();
+    const mySheetDayList = mySheet.getRange("5:5").getValues().flat();
     // 配列を更新して、Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換
-    const mySheetdayListFormattedArray = mySheetdayList.map(item => {
-        if (item instanceof Date) {
-            return formatDate(item);
-        }
-        return item;
-    });
-    let taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
-    for(n=0;n<taskList.length;n++){
-      if(taskList[n][2] === false){
-        copyTaskTable(mainsheet,mySheet);
-        mainsheet.getRange('B6').setValue(taskList[n][0]);
-        mySheet.getRange(9,taskCol)
-          .setValue(taskList[n][1])
-          .setFontColor("#0000FF");
-        taskList[n][2] = true ;
-      };
-    };
-  }catch(e){
-    console.log("csvCreateBody123",e);
-    // eがオブジェクトの場合、カスタムエラーとシステムエラーを取得する
-    const customErrorMessage = e.customError || '';
-    const systemErrorMessage = e.systemError || e.message || '';
-    createError(customErrorMessage, systemErrorMessage);
-  }finally{
+    const formattedDayList = formatDayList(mySheetDayList);
+
+        // 進捗の記録
+        recordProgress(taskList, today, formattedDayList, mainSheet, mySheet);
+
+  } catch (e) {
+    console.log("csvCreateProgress",e);
+    handleErrors(e);
+  } finally {
     return taskList;
 
   }
 }
+// Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換する関数
+function formatDayList(dayList) {
+    return dayList.map(item => (item instanceof Date) ? formatDate(item) : item);
+}
+// 進捗を記録する関数
+function recordProgress(taskList, today, formattedDayList, mainSheet, mySheet) {
+    let taskCol = findDateIndex(today, formattedDayList) + 1;
+    for(let n = 0; n < taskList.length; n++) {
+        if(!taskList[n][2]) {
+            copyTaskTable(mainSheet, mySheet);
+            mainSheet.getRange('B6').setValue(taskList[n][0]);
+            mySheet.getRange(9, taskCol).setValue(taskList[n][1]).setFontColor("#0000FF");
+            taskList[n][2] = true;
+        }
+    }
+}
+
+
+
+
 
 function CSVStringToArray(strData) {
     var rows = strData.trim().split("\n");
@@ -49,15 +74,6 @@ function CSVStringToArray(strData) {
         })
         return arrayDate;
     });
-}
-// Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換する関数
-function formatDate(date) {
-    return Utilities.formatDate(date, "Asia/Tokyo", "yyyy-MM-dd");
-}
-
-// 特定の日付のインデックスを取得するための関数
-function findDateIndex(dateString, arr) {
-    return arr.indexOf(dateString);
 }
 
 /** 配列内で値が重複してないか調べる **/
@@ -109,14 +125,9 @@ function uploadFile({content,fileName,taskList}) {
     const mainsheet = SpreadsheetApp.getActiveSpreadsheet();
     const mySheet = mainsheet.getSheetByName(myName[0]);
     let mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
-    const mySheetdayList = mySheet.getRange("5:5").getValues().flat();
+    const mySheetDayList = mySheet.getRange("5:5").getValues().flat();
     // 配列を更新して、Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換
-    const mySheetdayListFormattedArray = mySheetdayList.map(item => {
-        if (item instanceof Date) {
-            return formatDate(item);
-        }
-        return item;
-    });
+    const mySheetdayListFormattedArray = formatDayList(mySheetDayList);
 
       for(i=1;i<csvArray.length;i++){
         if(!csvArray[i][csvArrayTodayIndex]) continue;

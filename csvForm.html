@@ -263,10 +263,11 @@
                 btn.disabled = false; 
             });
           }).csvCreateReport({taskList});
+          console.log('csvCreateReport');
     });
 
     document.getElementById('createProgress').addEventListener('click', function() {
-      console.log('createReport',taskList);
+      console.log('createProgress',taskList);
       buttonIds.forEach(id => {
           const btn = document.getElementById(id);
           btn.disabled = true; // ボタンを無効化
