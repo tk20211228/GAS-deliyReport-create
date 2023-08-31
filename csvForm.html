@@ -69,6 +69,13 @@
               if (item.startsWith('"') && item.endsWith('"')) {
                   return item.slice(1, -1);
               }
+              let match = item.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+              if (match) {
+                const year = match[1];
+                const month = match[2].padStart(2, "0");
+                const day = match[3].padStart(2, "0");
+                return `${year}-${month}-${day}`;
+              }
               return item;
           });
           result.push(arrayData);
@@ -204,6 +211,7 @@
           });
 
         var csvArraryData = csvToArray(charArray);
+        console.log(csvArraryData);
         let index = csvArraryData[0].indexOf(todayToISO);
         taskList.length = 0; // taskListを空にする
         for(i=1;i<csvArraryData.length;i++){

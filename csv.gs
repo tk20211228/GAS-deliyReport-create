@@ -96,7 +96,7 @@ function copyTaskTable(mainSheet,mySheet){
 function uploadFile({content,fileName,taskList}) {
   
   try {
-    console.log(taskList);
+    // console.log(taskList);
     var base64Data = content.split(",")[1];
     // console.log("csvArray",csvArray);
     // Base64データをバイト配列にデコード
@@ -107,7 +107,7 @@ function uploadFile({content,fileName,taskList}) {
 
     // CSV文字列を配列に変換
     var csvArray = CSVStringToArray(csvString);
-    console.log(csvArray);
+
 
     const myName = getMyname();
     // console.log(myName)
@@ -120,6 +120,12 @@ function uploadFile({content,fileName,taskList}) {
     const data = new Date();
     const today = Utilities.formatDate(data, "Asia/Tokyo", "yyyy-MM-dd");
     const csvArrayTodayIndex = csvArray[0].indexOf(today);
+    // console.log(csvArrayTodayIndex);
+    // console.log(today);
+    // console.log(csvArray[0]);
+
+
+
     if (csvArrayTodayIndex === -1) {
       throw new Error("Today's date was not found in the CSV array.");
     };
@@ -136,7 +142,7 @@ function uploadFile({content,fileName,taskList}) {
         let taskRow = mySheetTaskList.indexOf(csvArray[i][0]) + 4 ;
         // console.log(taskRow);
         let taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
-        console.log(taskCol);
+        // console.log(taskCol);
         if (taskCol === 0) {
           throw new Error(today+"を、進捗シートの”5:5”から見つけることができませんでした。");
         };
