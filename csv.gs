@@ -20,26 +20,24 @@ function handleErrors(e) {
 function csvCreateProgress({taskList}){
   try{
     // 前準備と変数定義
-    const mainsheet = SpreadsheetApp.getActiveSpreadsheet();
+    const mainSheet = SpreadsheetApp.getActiveSpreadsheet();
     const myName = getMyname();
-    const mySheet = mainsheet.getSheetByName(myName[0]);
+    const mySheet = mainSheet.getSheetByName(myName[0]);
     const data = new Date();
     const today = Utilities.formatDate(data, "Asia/Tokyo", "yyyy-MM-dd");
     const mySheetDayList = mySheet.getRange("5:5").getValues().flat();
     // 配列を更新して、Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換
     const formattedDayList = formatDayList(mySheetDayList);
-
-        // 進捗の記録
-        recordProgress(taskList, today, formattedDayList, mainSheet, mySheet);
-
+    // 進捗の記録
+    recordProgress(taskList, today, formattedDayList, mainSheet, mySheet);
   } catch (e) {
     console.log("csvCreateProgress",e);
     handleErrors(e);
   } finally {
     return taskList;
-
   }
 }
+
 // Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換する関数
 function formatDayList(dayList) {
     return dayList.map(item => (item instanceof Date) ? formatDate(item) : item);
@@ -57,10 +55,6 @@ function recordProgress(taskList, today, formattedDayList, mainSheet, mySheet) {
     }
 }
 
-
-
-
-
 function CSVStringToArray(strData) {
     var rows = strData.trim().split("\n");
     return rows.map(function(row) {
@@ -69,6 +63,13 @@ function CSVStringToArray(strData) {
         arrayDate = arrayDate.map(item => {
           if(item.startsWith('"') && item.endsWith('"')){
             return item.slice(1,-1);
+          }
+          let match = item.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+          if (match) {
+            const year = match[1];
+            const month = match[2].padStart(2, "0");
+            const day = match[3].padStart(2, "0");
+            return `${year}-${month}-${day}`;
           }
           return item;
         })
@@ -82,11 +83,11 @@ function existsSameValue(a){
   return s.size != a.length;
 }
 
-function copyTaskTable(mainsheet,mySheet){
+function copyTaskTable(mainSheet,mySheet){
   // console.log("コピー実行");
     mySheet.insertRowsAfter(1, 18);
     mySheet.getRange('2:18').shiftRowGroupDepth(1);
-    const copySheet = mainsheet.getSheetByName("コピー元");
+    const copySheet = mainSheet.getSheetByName("コピー元");
     const copysheetRange = copySheet.getRange("A1:PN18");
     copysheetRange.copyTo(mySheet.getRange("A1:PN18"), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
   // console.log("コピー完了");
@@ -106,6 +107,7 @@ function uploadFile({content,fileName,taskList}) {
 
     // CSV文字列を配列に変換
     var csvArray = CSVStringToArray(csvString);
+    console.log(csvArray);
 
     const myName = getMyname();
     // console.log(myName)
@@ -122,8 +124,8 @@ function uploadFile({content,fileName,taskList}) {
       throw new Error("Today's date was not found in the CSV array.");
     };
     const todayTaskTimeList = [];
-    const mainsheet = SpreadsheetApp.getActiveSpreadsheet();
-    const mySheet = mainsheet.getSheetByName(myName[0]);
+    const mainSheet = SpreadsheetApp.getActiveSpreadsheet();
+    const mySheet = mainSheet.getSheetByName(myName[0]);
     let mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
     const mySheetDayList = mySheet.getRange("5:5").getValues().flat();
     // 配列を更新して、Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換
