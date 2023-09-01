@@ -66,7 +66,7 @@ function taskBody({activeSheet,taskRow,taskCol}){
     const todayActualItemProgress         = formatNumberToFixed(selectAllPlanVlales[10][todayAchievementNo]* 100);//進捗率　(実績)
     const todayPlanUsingTimeProgress      = formatNumberToFixed(selectAllPlanVlales[11][todayAchievementNo]* 100);//工数進捗　(計画)
     const todayActualTimeProgress         = formatNumberToFixed(selectAllPlanVlales[12][todayAchievementNo]* 100);//工数進捗　(実績)
-    const todayMemo                  = selectAllPlanVlales[13][todayAchievementNo];          // メモ
+    const todayMemo                  = selectAllPlanVlales[13][todayAchievementNo].replace(/\n/g, "\n　");          // メモ　正規表現（/\n/g）を用いて文字列内のすべての改行コード（\n）を検索
 
     // const tomorrowPlanUsingItem      = Number(selectAllPlanVlales[1][nexstdayAchievementNo]);// 予定項目数  計画(明日)
     // const tomorrowPlanUsingTime      = Number(selectAllPlanVlales[2][nexstdayAchievementNo]);// 予定工数   計画(明日)
@@ -85,7 +85,7 @@ function taskBody({activeSheet,taskRow,taskCol}){
     const tomorrowActualItemProgress       = formatNumberToFixed(selectAllPlanVlales[10][nexstdayAchievementNo]* 100);//予定進捗率(実績)(次日)
     // const tomorrowPlanUsingTimeProgress = selectAllPlanVlales[11][nexstdayAchievementNo];//予定工数進捗(計画)(次日)
     const tomorrowActualUsingTimeProgress  = formatNumberToFixed(selectAllPlanVlales[12][nexstdayAchievementNo]* 100);//予定工数進捗(実績)(次日) 
-    const tomorrowMemo                     = selectAllPlanVlales[13][nexstdayAchievementNo];       // メモ
+    const tomorrowMemo                     = selectAllPlanVlales[13][nexstdayAchievementNo].replace(/\n/g, "\n　");       // メモ
 // 
 
 

@@ -64,9 +64,11 @@ function CSVStringToArray(strData) {
           if(item.startsWith('"') && item.endsWith('"')){
             return item.slice(1,-1);
           }
+          // \d{1,2}は、\d（任意の数字）が1回から2回まで現れるパターンにマッチします。例えば、「1」、「12」などが該当しますが、「123」は該当しません（「123」の最初の2文字は該当しますが）
           let match = item.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
           if (match) {
             const year = match[1];
+            // メソッドは、指定された長さになるまで文字列の先頭を特定の文字で埋める。このメソッドは2つの引数を取る。目標の長さ：この例では 2　埋める文字：この例では "0"
             const month = match[2].padStart(2, "0");
             const day = match[3].padStart(2, "0");
             return `${year}-${month}-${day}`;
