@@ -12,10 +12,10 @@ function myName() {
 try{
   const myData = getMyname();
   // console.log("myData");
-  let fullName = myData[0];
-  let familyName =  myData[1];
+  let fullName = myData[1];
+  let familyName =  myData[0];
   let mailAddress =  myData[2];
-  Browser.msgBox("性名："+ fullName + "\\n" + "性："+ familyName +"\\n" + "メールアドレス："+mailAddress);
+  Browser.msgBox("性："+ familyName + "\\n"+ "性名："+ fullName  + "\\n" + "メールアドレス："+mailAddress);
 
 }catch(e){
   console.log(e)

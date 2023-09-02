@@ -31,7 +31,7 @@
       const appComponent = {
         setup() {
           const firstName = ref("<?= myProp.myFirstName ?>");
-          const lastName = ref('');
+          const lastName = ref('<?= myProp.myLastName ?>');
           const email = ref("<?= myProp.userEmail ?>");
           const loading = ref(false);
           const isValid = ref(false);
@@ -58,7 +58,13 @@
                 alert('Errorが発生しました。\n'+e);
                 return;
               }
-              alert('保存に成功しました。\nプロパティ一覧で設定内容をご確認ください。');
+              alert(`保存に成功しました。
+プロパティ一覧で設定内容をご確認ください。
+【設定内容】
+・プロパティ名「${firstName.value}」：設定値「${ firstName.value + lastName.value }」
+・プロパティ名「${email.value}」：設定値「${firstName.value}」
+
+`);
               google.script.run.withSuccessHandler().openCheck();
               // loading.value = false;
               // google.script.host.close();

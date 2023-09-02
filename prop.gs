@@ -3,28 +3,29 @@
 //スクリプトプロパティを一括取得してダイアログで返す
 function openCheck() {
   var html = HtmlService.createHtmlOutputFromFile('proplist')
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    // .setSandboxMode(HtmlService.SandboxMode.IFRAME)　※現在は、不要　https://developers.google.com/apps-script/reference/html/html-output#setsandboxmodemode
     .setWidth(600)
-    .setHeight(360);
- 
-  SpreadsheetApp.getUi() 
-    .showModalDialog(html, '設定済みプロパティ一覧');
+    .setHeight(360);// createHtmlOutputFromFile 静的なHTMLを出力する
+  SpreadsheetApp.getUi().showModelessDialog(html, '設定済みプロパティ一覧'); // showModalDialogでは非活性となる
 }
 function inputMyprop() {
   const userEmail = Session.getActiveUser().getEmail();
   // const myName = getMyname();
-  const myFirstName = getProp(userEmail);;
-  const myProp ={myFirstName,userEmail};
-
+  const myFirstName = getProp(userEmail);
+  // console.log(myFirstName)
+  let myLastName = getProp(myFirstName);
+  if(!myLastName){
+    myLastName = "";
+  }else{
+    myLastName = getProp(myFirstName).replace(myFirstName,"")
+  }
+  const myProp ={myFirstName,myLastName,userEmail};
   var output = HtmlService.createTemplateFromFile('propmydata')
-    output.myProp = myProp
-  
-  var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    output.myProp = myProp // createTemplateFromFileは動的な内容（変数や条件文などサーバーサイドのJavaScriptコード）をHTMLに埋め込むことができる
+  var html = output.evaluate()
     .setWidth(600)
     .setHeight(360);
- 
-  SpreadsheetApp.getUi() 
-    .showModalDialog(html, 'プロパティ 設定');
+  SpreadsheetApp.getUi().showModelessDialog(html, 'プロパティ 設定'); // showModalDialogでは非活性となる
 }
 
 
