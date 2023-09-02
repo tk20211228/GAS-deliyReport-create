@@ -4,7 +4,11 @@
     <base target="_top">
     <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/vuetify/2.3.17/vuetify.css" rel="stylesheet">
+
+    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/vuetify/2.3.17/vuetify.css" rel="stylesheet"> -->
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.7.1/dist/vuetify.min.css" rel="stylesheet">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/vuetify@3.3.15/dist/vuetify.min.css" rel="stylesheet"> -->
+
     <style>
       html, body{
         overflow: hidden;
@@ -96,8 +100,8 @@
           <template>
             <v-bottom-sheet v-model="sheet" inset>
               <v-sheet class="text-center" height="200px">
-                <v-btn class="mt-6" text color="error" @Click="onApprove">実行</v-btn>
-                <v-btn class="mt-6" text color="error" @Click="onReject">キャンセル</v-btn>
+                <v-btn class="mt-6" text color="error" @click="onApprove">実行</v-btn>
+                <v-btn class="mt-6" text color="error" @click="onReject">キャンセル</v-btn>
                 <div class="my-3">プロパティをすべて削除しますか？</div>
               </v-sheet>
             </v-bottom-sheet>
@@ -114,11 +118,11 @@
                       <v-container>
                         <v-row>
                           <v-col cols="12" sm="6"	md="4">
-                            <v-text-field　label="プロパティ名*" required v-model="recman.propname" :rules="[rules.required]">
+                            <v-text-field label="プロパティ名*" required v-model="recman.propname" :rules="[rules.required]">
                             </v-text-field>
                           </v-col>
                           <v-col cols="12" sm="6"	md="4">
-                            <v-text-field　label="設定値*" required v-model="recman.propvalue" :rules="[rules.required]">
+                            <v-text-field label="設定値*" required v-model="recman.propvalue" :rules="[rules.required]">
                             </v-text-field>
                           </v-col>
                         </v-row>
@@ -126,7 +130,7 @@
                           <div>プロパティタイプ</div>
                           <v-radio-group v-model="recman.proptype" row :rules="[rules.required]">
                             <v-radio label="スクリプト" value="0"></v-radio>
-                            <v-radio label="ユーザ" value="1"></v-radio>
+                            <!-- <v-radio label="ユーザ" value="1"></v-radio> -->
                           </v-radio-group>
                         </v-row>
                       </v-container>
@@ -148,20 +152,21 @@
 
           <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn  color="red darken-1"  text  @click="onAdd">
-                新規追加
-              </v-btn>
+              <v-btn  color="red darken-1"  text  @click="onAdd">新規追加</v-btn>
+              <v-btn  color="red darken-1"  text  @click="onClear">全削除</v-btn>
               <v-btn  color="red darken-1"  text  @click="google.script.host.close()">閉じる</v-btn>
-              <!-- <v-btn  color="red darken-1"  text  @click="onClear">
-                全削除
-              </v-btn> -->
           </v-card-actions>
         </v-card>
-      <v-app>
+      </v-app>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuetify/2.3.17/vuetify.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4"></script> -->
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vuetify/2.3.17/vuetify.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.7.1/dist/vuetify.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vuetify@3.3.15/dist/vuetify.min.js"></script> -->
 
     <script>
       var vm = "";
@@ -181,7 +186,11 @@
             sound: true,
             widgets: false,
             dialogtitle:"プロパティの新規追加",
-            recman:{},
+            recman:{
+              proptype: "0",  // デフォルト値を設定
+              propname: "",
+              propvalue: ""
+            },
             rules:{
               //必須項目のvalidation
 			        required: value => !!value || "必ず入力してください", 
@@ -207,7 +216,7 @@
               editflg = 0
 
               //フォーム内容をクリア
-              this.recman = {};
+              // this.recman = {};
 
               //ダイアログを開く
               this.dialog = true;

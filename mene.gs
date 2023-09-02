@@ -25,5 +25,6 @@ function onOpen(){
         .addItem('選択範囲の位置を取得', 'mygetRowcolumnActiveRange')//メンテナンス.gsで管理
         .addItem('getRangeで使用できる選択範囲の位置','mygetRowcolumnActiveRange0530')//メンテナンス.gsで管理//
         .addItem('プロパティ確認','openCheck')//propで管理
+        .addItem('プロパティ設定','inputMyprop')//propで管理
         .addToUi();
 };

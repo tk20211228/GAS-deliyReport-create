@@ -1,17 +1,34 @@
 function myName() {
-let user = Session.getActiveUser(); // スクリプトの実行者を取得
-let contact = ContactsApp.getContact(user); // 実行者の連絡帳データを取得
+// let user = Session.getActiveUser(); // スクリプトの実行者を取得
+// let contact = ContactsApp.getContact(user); // 実行者の連絡帳データを取得
 
-let fullName = contact.getFullName(); // フルネームを取得
-let familyName = contact.getFamilyName(); // 姓（苗字）のみ
-let givenName = contact.getGivenName(); // 名（下の名前）のみ
-console.log(fullName);
-console.log(familyName);
-console.log(givenName);
+// let fullName = contact.getFullName(); // フルネームを取得
+// let familyName = contact.getFamilyName(); // 姓（苗字）のみ
+// let givenName = contact.getGivenName(); // 名（下の名前）のみ
+// console.log(fullName);
+// console.log(familyName);
+// console.log(givenName);
+// let mailAddress = user.getUserLoginId();
+try{
+  const myData = getMyname();
+  // console.log("myData");
+  let fullName = myData[0];
+  let familyName =  myData[1];
+  let mailAddress =  myData[2];
+  Browser.msgBox("性名："+ fullName + "\\n" + "性："+ familyName +"\\n" + "メールアドレス："+mailAddress);
 
-let mailAddress = user.getUserLoginId();
-
-Browser.msgBox("性名："+ fullName + "\\n" + "性："+ familyName + "\\n" + "名："+ givenName+ "\\n" + "メールアドレス："+mailAddress);
+}catch(e){
+  console.log(e)
+  if(e.systemError === "not myprop"){
+    Browser.msgBox('ユーザー名が設定されていません。\\nプロパティ設定で設定後、再度実行してください。', Browser.Buttons.YES);
+    inputMyprop();
+    return;
+  }
+  // eがオブジェクトの場合、カスタムエラーとシステムエラーを取得する
+    const customErrorMessage = e.customError || '';
+    const systemErrorMessage = e.systemError || e.message || '';
+    createError(customErrorMessage, systemErrorMessage);
+}
 }
 
 //選択範囲の位置を取得

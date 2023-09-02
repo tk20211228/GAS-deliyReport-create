@@ -149,29 +149,34 @@ function createBody(myName){
 }
 
 function createReport(){
-  const myName = getMyname();
   ///メールの内容を作成
   try{
+      const myName = getMyname(); // Errorがあるとnot mypropが返る
       var bodyItem = createBody(myName);
-      console.log(bodyItem);
+      // console.log(bodyItem);
+      if(!bodyItem) return;
+
+      let title = bodyItem.subject[0];
+      var output = HtmlService.createTemplateFromFile('index');
+      output.bodyItemJSON = JSON.stringify(bodyItem);
+      output.bodyItem = bodyItem;
+      output.inputsub = title;
+      output.inputCss = HtmlService.createHtmlOutputFromFile('css').getContent();
+      output.inputJs = HtmlService.createHtmlOutputFromFile('js').getContent();
+
+      var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .setWidth(1100)
+      .setHeight(790);
+      SpreadsheetApp.getUi().showModelessDialog(html, title);
     }catch(e){
-      const body = '<p>開始予定,完了予定の表示形式に問題がある可能性があります。</p>';
-      const error = e.message;
-      createError(body,error);
+      if(e.systemError === "not myprop"){
+        Browser.msgBox('ユーザー名が設定されていません。\\nプロパティ設定で設定後、再度実行してください。', Browser.Buttons.YES);
+        inputMyprop();
+        return;
+      };
+      const customErrorMessage = e.customError || body || '';
+      const systemErrorMessage = e.systemError || e.message || '';
+      createError(customErrorMessage, systemErrorMessage);
     }
-  if(!bodyItem) return;
-
-  let title = bodyItem.subject[0];
-  var output = HtmlService.createTemplateFromFile('index');
-  output.bodyItemJSON = JSON.stringify(bodyItem);
-  output.bodyItem = bodyItem;
-  output.inputsub = title;
-  output.inputCss = HtmlService.createHtmlOutputFromFile('css').getContent();
-  output.inputJs = HtmlService.createHtmlOutputFromFile('js').getContent();
-
-  var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
-  .setWidth(1100)
-  .setHeight(790);
-  SpreadsheetApp.getUi().showModelessDialog(html, title);
 
 };

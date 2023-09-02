@@ -177,8 +177,17 @@ function uploadFile({content,fileName,taskList}) {
       }
     return taskList;
   } catch (e) {
-    console.log(e);
-    createError(e.message);
+
+    console.log(e)
+    if(e.systemError === "not myprop"){
+      Browser.msgBox('ユーザー名が設定されていません。\\nプロパティ設定で設定後、再度実行してください。', Browser.Buttons.YES);
+      inputMyprop();
+      return;
+    }
+    // eがオブジェクトの場合、カスタムエラーとシステムエラーを取得する
+    const customErrorMessage = e.customError || '';
+    const systemErrorMessage = e.systemError || e.message || '';
+    createError(customErrorMessage, systemErrorMessage);
   }
 }
 

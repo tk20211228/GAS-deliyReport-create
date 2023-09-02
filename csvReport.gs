@@ -242,12 +242,12 @@ function csvCreateReport({taskList}){
   try {
     const myName = getMyname();
     // console.log(myName)
-    if(!myName[1]) {
-        throw {
-            customError: '<p>プロパティに名前が登録されていません。<br/>管理者にお問い合わせください</p>',
-            systemError: null
-        };
-    }
+    // if(!myName[1]) {
+    //     throw {
+    //         customError: '<p>プロパティに名前が登録されていません。<br/>管理者にお問い合わせください</p>',
+    //         systemError: null
+    //     };
+    // }
     var bodyItem = csvCreateBody({myName,taskList});
     console.log('bodyItem',bodyItem);
     let title = bodyItem.subject;
@@ -262,14 +262,16 @@ function csvCreateReport({taskList}){
     .setWidth(1100)
     .setHeight(790);
     SpreadsheetApp.getUi().showModelessDialog(html, title);
-    console.log('TEST');
-
   }catch(e){
-    // console.log("csvCreateBody123",e);
+    console.log(e)
+    if(e.systemError === "not myprop"){
+      Browser.msgBox('ユーザー名が設定されていません。\\nプロパティ設定で設定後、再度実行してください。', Browser.Buttons.YES);
+      inputMyprop();
+      return;
+    }
     // eがオブジェクトの場合、カスタムエラーとシステムエラーを取得する
     const customErrorMessage = e.customError || '';
     const systemErrorMessage = e.systemError || e.message || '';
     createError(customErrorMessage, systemErrorMessage);
   }
- 
 };

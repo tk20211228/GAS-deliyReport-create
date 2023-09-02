@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@3.3.5/dist/vuetify.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.3.5/dist/vuetify.min.js"></script>
+
+  </head>
+  <body>
+    <div id="app">
+      <v-container>
+          <v-sheet width="300" class="mx-auto">
+            <v-form autocomplete="off" ref="form" @submit.prevent="submit">
+              <v-text-field v-model="firstName" label="姓" :rules="nameRules"></v-text-field>
+              <v-text-field v-model="lastName" label="名" :rules="nameRules"></v-text-field>
+              <v-text-field v-model="email" label="E-mail" hide-details required></v-text-field>
+              <v-btn :disabled="!isValid" :loading="loading" type="submit" block class="mt-2">保存</v-btn>
+            </v-form>
+          </v-sheet>
+      </v-container>
+    </div>
+  </body>
+    <script>
+      const { createApp, ref } = Vue
+      const { createVuetify } = Vuetify
+
+      const vuetify = createVuetify()
+
+      const appComponent = {
+        setup() {
+          const firstName = ref("<?= myProp.myFirstName ?>");
+          const lastName = ref('');
+          const email = ref("<?= myProp.userEmail ?>");
+          const loading = ref(false);
+          const isValid = ref(false);
+
+          const nameRules = ref([
+            value => {
+              if (value?.length >= 1) {
+                if(!(firstName.value.length>= 1 && lastName.value.length>= 1) ) return;
+                isValid.value = true
+                return true;
+              };
+              isValid.value = false;
+              return '１文字以上で設定してください。';
+            },
+
+          ]);
+
+          const submit = async () => {
+            loading.value = true;
+            // await new Promise(resolve => setTimeout(resolve, 1000))
+            // Google Apps Script関数の呼び出し
+            google.script.run.withSuccessHandler((e) => {
+              if(!e){
+                alert('Errorが発生しました。\n'+e);
+                return;
+              }
+              alert('保存に成功しました。\nプロパティ一覧で設定内容をご確認ください。');
+              google.script.run.withSuccessHandler().openCheck();
+              // loading.value = false;
+              // google.script.host.close();
+            }).setMyprop({firstName: firstName.value, lastName: lastName.value, email: email.value});
+          };
+
+
+
+
+
+          return { firstName, lastName, loading, nameRules, submit ,isValid , email};
+        }
+      };
+      const app = createApp(appComponent);
+      app.use(vuetify).mount('#app')
+   </script>
+</html>

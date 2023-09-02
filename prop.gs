@@ -10,6 +10,24 @@ function openCheck() {
   SpreadsheetApp.getUi() 
     .showModalDialog(html, '設定済みプロパティ一覧');
 }
+function inputMyprop() {
+  const userEmail = Session.getActiveUser().getEmail();
+  // const myName = getMyname();
+  const myFirstName = getProp(userEmail);;
+  const myProp ={myFirstName,userEmail};
+
+  var output = HtmlService.createTemplateFromFile('propmydata')
+    output.myProp = myProp
+  
+  var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .setWidth(600)
+    .setHeight(360);
+ 
+  SpreadsheetApp.getUi() 
+    .showModalDialog(html, 'プロパティ 設定');
+}
+
+
 
 //プロパティをすべて削除する
 function clearprop(){
@@ -114,3 +132,22 @@ function oninsert(recman){
     return "NG";
   }
 }
+
+// function setMyprop(){
+function setMyprop({firstName,lastName,email}){
+  console.log(firstName,lastName,email);
+  //プロパティをセットする
+  try{
+    const fullName = firstName+lastName;
+    const propType =  PropertiesService.getScriptProperties();
+    propType.setProperty(firstName,fullName);
+    propType.setProperty(email,firstName);
+    return true;
+  }catch(e){
+    return e.message;
+  }
+
+}
+
+
+

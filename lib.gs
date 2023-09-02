@@ -93,19 +93,25 @@ function getMyname(){
   console.log(familyName);
   console.log(fullName);
   if(!familyName){
-    var name = myNameSerach();
-    var familyName = name[0];
-    // console.log('確認：'+familyName);
+      // Browser.msgBox('ユーザー名が設定されていません。\\nプロパティ設定で設定後、再度実行してください。', Browser.Buttons.YES_NO);
+      throw {
+          customError: `ユーザー名が設定されていません。プロパティ設定で設定後、再度実行してください。`,
+          systemError: "not myprop"
+      };
+      // return false;
+    // var name = myNameSerach();
+    // var familyName = name[0];
+    // // console.log('確認：'+familyName);
 
-    var fullName = name[1];
-    // console.log('確認：'+fullName);
-    if(familyName != '（姓）'){
-      setProp(userEmail,familyName);
-      setProp(familyName,fullName);
-    }
+    // var fullName = name[1];
+    // // console.log('確認：'+fullName);
+    // if(familyName != '（姓）'){
+    //   setProp(userEmail,familyName);
+    //   setProp(familyName,fullName);
+    // }
   }
   // console.log(name);
-  return [familyName,fullName];
+  return [familyName,fullName,userEmail];
 
 }
 
