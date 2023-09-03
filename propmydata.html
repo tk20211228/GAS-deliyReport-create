@@ -66,15 +66,8 @@
 
 `);
               google.script.run.withSuccessHandler().openCheck();
-              // loading.value = false;
-              // google.script.host.close();
             }).setMyprop({firstName: firstName.value, lastName: lastName.value, email: email.value});
           };
-
-
-
-
-
           return { firstName, lastName, loading, nameRules, submit ,isValid , email};
         }
       };
