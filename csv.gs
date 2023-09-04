@@ -110,23 +110,11 @@ function uploadFile({content,fileName,taskList}) {
     // CSV文字列を配列に変換
     var csvArray = CSVStringToArray(csvString);
 
-
     const myName = getMyname();
-    // console.log(myName)
-    if(!myName[1]) {
-        const body = '<p>エラー内容をご確認ください。</p><p>【エラー内容】</p><p>プロパティに名前が登録されていません。<br/>管理者にお問い合わせください</p>'
-        createError(body);
-        return
-    }
     // ダイヤログ確認
     const data = new Date();
     const today = Utilities.formatDate(data, "Asia/Tokyo", "yyyy-MM-dd");
     const csvArrayTodayIndex = csvArray[0].indexOf(today);
-    // console.log(csvArrayTodayIndex);
-    // console.log(today);
-    // console.log(csvArray[0]);
-
-
 
     if (csvArrayTodayIndex === -1) {
       throw new Error("Today's date was not found in the CSV array.");
@@ -176,8 +164,8 @@ function uploadFile({content,fileName,taskList}) {
         };
       }
     return taskList;
-  } catch (e) {
 
+  } catch (e) {
     console.log(e)
     if(e.systemError === "not myprop"){
       Browser.msgBox('ユーザー名が設定されていません。\\nプロパティ設定で設定後、再度実行してください。', Browser.Buttons.YES);
