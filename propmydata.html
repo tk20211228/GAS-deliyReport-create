@@ -11,12 +11,12 @@
   <body>
     <div id="app">
       <v-container>
-          <v-sheet width="300" class="mx-auto" >
+          <v-sheet width="300" class="mx-auto">
             <v-form autocomplete="off" ref="form" @submit.prevent="submit">
-              <v-text-field v-model="firstName" label="姓" :rules="nameRules"></v-text-field>
-              <v-text-field v-model="lastName" label="名" :rules="nameRules"></v-text-field>
+              <v-text-field v-model="firstName" clearable label="姓" :rules="nameRules" color="red darken-1"></v-text-field>
+              <v-text-field v-model="lastName" label="名" :rules="nameRules" color="primary-darken-1" clearable></v-text-field>
               <v-text-field v-model="email" label="E-mail" hide-details required></v-text-field>
-              <v-btn :disabled="!isValid" :loading="loading" type="submit" block class="mt-2">保存</v-btn>
+              <v-btn :disabled="!isValid" :loading="loading" type="submit" block class="mt-6" color="blue-lighten-5" >保存</v-btn>
             </v-form>
           </v-sheet>
       </v-container>
@@ -49,10 +49,8 @@
 
           ]);
 
-          const submit = async () => {
+          const submit = () => {
             loading.value = true;
-            // await new Promise(resolve => setTimeout(resolve, 1000))
-            // Google Apps Script関数の呼び出し
             google.script.run.withSuccessHandler((e) => {
               if(!e){
                 alert('Errorが発生しました。\n'+e);
