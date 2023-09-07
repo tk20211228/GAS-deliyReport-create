@@ -18,19 +18,30 @@
       </symbol>
     </svg>
 
+    <!-- Main content container -->
     <div class="container mt-2">
+
+          <!-- Error alert box -->
           <div class="alert alert-danger">
             <div class="d-flex align-items-center" >
-              <svg class="bi flex-shrink-0 me-2" width="24" height="24"><use xlink:href="#exclamation-triangle-fill"/></svg>
+              <svg class="bi flex-shrink-0 me-2" width="24" height="24">
+                <use xlink:href="#exclamation-triangle-fill"/>
+              </svg>
+              <!-- Error message -->
               <div>
                 エラーが発生しました
               </div>
+            <!-- Horizontal rule -->
             </div>
             <hr>
-            <p><?= error ?></p> <!-- エラーメッセージを表示 -->
+            <!-- Error details -->
+            <p><?= error ?></p>
+            <!-- Additional content -->
             <?!= body ?>
         </div>
-        <div class="d-flex justify-content-end"> <!-- このdivを追加 -->
+
+        <!-- Close button -->
+        <div class="d-flex justify-content-end"> 
             <button type="button" class="btn btn-outline-secondary" onclick="google.script.host.close()">閉じる</button>
         </div>
     </div>

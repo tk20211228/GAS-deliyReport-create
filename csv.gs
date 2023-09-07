@@ -14,7 +14,10 @@ function handleErrors(e) {
     const systemErrorMessage = e.systemError || e.message || '';
     createError(customErrorMessage, systemErrorMessage);
 }
-
+// Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換する関数
+function formatDayList(dayList) {
+    return dayList.map(item => (item instanceof Date) ? formatDate(item) : item);
+}
 
 // 主要な処理を行う関数
 function csvCreateProgress({taskList}){
@@ -38,10 +41,6 @@ function csvCreateProgress({taskList}){
   }
 }
 
-// Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換する関数
-function formatDayList(dayList) {
-    return dayList.map(item => (item instanceof Date) ? formatDate(item) : item);
-}
 // 進捗を記録する関数
 function recordProgress(taskList, today, formattedDayList, mainSheet, mySheet) {
     let taskCol = findDateIndex(today, formattedDayList) + 1;

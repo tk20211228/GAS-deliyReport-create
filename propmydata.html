@@ -4,8 +4,10 @@
     <base target="_top">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/vuetify@3.3.5/dist/vuetify.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.3.5/dist/vuetify.min.js"></script>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/vuetify@3.3.5/dist/vuetify.min.css" rel="stylesheet"> -->
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@3.3.15/dist/vuetify.min.css" rel="stylesheet">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vuetify@3.3.5/dist/vuetify.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.3.15/dist/vuetify.min.js"></script>
 
   </head>
   <body>
@@ -16,7 +18,7 @@
               <v-text-field v-model="firstName" label="姓" :rules="nameRules" class="mt-2" color="primary-darken-1" variant="outlined"></v-text-field>
               <v-text-field v-model="lastName" label="名" :rules="nameRules" class="mt-2" color="primary-darken-1" variant="outlined"></v-text-field>
               <v-text-field v-model="email" label="E-mail" class="mt-2" color="primary-darken-1" variant="outlined" ></v-text-field>
-              <v-btn :disabled="!isValid" :loading="loading" type="submit" class="mt-5" color="primary-darken-1" variant="outlined" block >保存</v-btn>
+              <v-btn :disabled="!isValid" :loading="loading" type="submit" class="mt-3" color="primary-darken-1" variant="outlined" block >保存</v-btn>
             </v-form>
           </v-sheet>
       </v-container>
