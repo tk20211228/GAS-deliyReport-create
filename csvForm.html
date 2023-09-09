@@ -177,11 +177,7 @@
       });
     });
 
-    document.getElementById('inputGroupFileAddon').addEventListener('click', function() {
-      // console.log("TEST");
-      const csvType = '<?= csvType ?>';
-      // console.log(csvType);
-      
+    document.getElementById('inputGroupFileAddon').addEventListener('click', function() {   
       buttonIds.forEach(id => {
           const btn = document.getElementById(id);
           btn.disabled = true; // ボタンを無効化
@@ -220,38 +216,22 @@
         }
         createTableBody(taskList);
   
-        // 関数を呼び出して合計行を追加
-        // addTotalRow();
-
         // Spinnerを表示
         document.getElementById('overlay').style.display = 'block';
-
-        if(csvType === 'csvInput'){
-          google.script.run.withSuccessHandler(function (res){
-            taskList = res;
-            createTableBody(taskList);
-            addTotalRow();
-            console.log("taskList123",taskList);
-            // await new Promise(r => setTimeout(r, 10000)); // 3秒間のスリープ
-            document.getElementById('overlay').style.display = 'none';
-            buttonIds.forEach(id => {
-                const btn = document.getElementById(id);
-                btn.disabled = false; 
-            });
-
-            // google.script.host.close();
-          }).uploadFile({content,fileName,taskList});
-        };
-
-        if(csvType === 'csvOutput'){
-          google.script.run.withSuccessHandler(function (){
-            document.getElementById('overlay').style.display = 'none';
-            buttonIds.forEach(id => {
-                const btn = document.getElementById(id);
-                btn.disabled = false; 
-            });
-          }).csvCreateReport({taskList});
-        };     
+        google.script.run.withSuccessHandler(function (res){
+          taskList = res;
+          createTableBody(taskList);
+          // 関数を呼び出して合計行を追加
+          addTotalRow();
+          console.log("taskList123",taskList);
+          // await new Promise(r => setTimeout(r, 10000)); // 3秒間のスリープ
+          document.getElementById('overlay').style.display = 'none';
+          buttonIds.forEach(id => {
+              const btn = document.getElementById(id);
+              btn.disabled = false; 
+          });
+          // google.script.host.close();
+        }).uploadFile({content,fileName,taskList});
       }
       reader.readAsDataURL(file);
     });

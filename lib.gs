@@ -1,8 +1,8 @@
-function createError(body,error) {
+function createError(customErrorMessage,systemErrorMessage) {
   let title = 'エラー';
   var output = HtmlService.createTemplateFromFile('Dailog');
-  output.body = body;
-  output.error = error;
+  output.customErrorMessage = customErrorMessage;
+  output.systemErrorMessage = systemErrorMessage;
   output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
   var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .setWidth(533)

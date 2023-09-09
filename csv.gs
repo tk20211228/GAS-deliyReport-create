@@ -1,12 +1,13 @@
-// 共通で使う関数や変数を先に定義する
 // Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換する関数
 function formatDate(date) {
     return Utilities.formatDate(date, "Asia/Tokyo", "yyyy-MM-dd");
 }
+
 // 特定の日付のインデックスを取得するための関数
 function findDateIndex(dateString, arr) {
     return arr.indexOf(dateString);
 }
+
 // エラーハンドリングの関数
 function handleErrors(e) {
   // eがオブジェクトの場合、カスタムエラーとシステムエラーを取得する
@@ -14,6 +15,7 @@ function handleErrors(e) {
     const systemErrorMessage = e.systemError || e.message || '';
     createError(customErrorMessage, systemErrorMessage);
 }
+
 // Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換する関数
 function formatDayList(dayList) {
     return dayList.map(item => (item instanceof Date) ? formatDate(item) : item);
@@ -94,7 +96,7 @@ function copyTaskTable(mainSheet,mySheet){
   // console.log("コピー完了");
 }
 
-function uploadFile({content,fileName,taskList}) {
+function uploadFile({content,taskList}) {
   
   try {
     // console.log(taskList);
@@ -121,6 +123,16 @@ function uploadFile({content,fileName,taskList}) {
     const todayTaskTimeList = [];
     const mainSheet = SpreadsheetApp.getActiveSpreadsheet();
     const mySheet = mainSheet.getSheetByName(myName[0]);
+    if(!mySheet){
+      throw {
+          customError: `「${myName[0]}」シートがありません。
+プロパティ設定で「姓」が正しく設定されているか確認してください。
+または、
+シート名が正しく設定されているか確認してください。`,
+          systemError: null
+      };
+    }
+
     let mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
     const mySheetDayList = mySheet.getRange("5:5").getValues().flat();
     // 配列を更新して、Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換
@@ -182,19 +194,6 @@ function csvInput() {
   let title = 'CSV入力';
   var output = HtmlService.createTemplateFromFile('csvForm');
   output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
-  output.csvType = "csvInput"; 
-  var html = output.evaluate()
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-    .setWidth(750)
-    .setHeight(325);
-  SpreadsheetApp.getUi().showModelessDialog(html, title);
-}
-
-function csvOutput() {
-  let title = 'CSV出力';
-  var output = HtmlService.createTemplateFromFile('csvForm');
-  output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
-  output.csvType = "csvOutput"; 
   var html = output.evaluate()
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .setWidth(750)
