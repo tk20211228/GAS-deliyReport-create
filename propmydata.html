@@ -58,13 +58,7 @@
                 alert('Errorが発生しました。\n'+e);
                 return;
               }
-//               alert(`保存に成功しました。
-// プロパティ一覧で設定内容をご確認ください。
-// 【設定内容】
-// ・プロパティ名「${firstName.value}」：設定値「${ firstName.value + lastName.value }」
-// ・プロパティ名「${email.value}」：設定値「${firstName.value}」
-
-// `);
+              alert(`保存が完了しました。`);
               // google.script.run.withSuccessHandler().openCheck();
               google.script.host.close();
             }).setMyprop({firstName: firstName.value, lastName: lastName.value, email: email.value});

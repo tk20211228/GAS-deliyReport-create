@@ -1,9 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="jp">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?!= inputLib ?>
+    <style>
+  .pre-line-style {
+    white-space: pre-line;
+  }
+
+</style>
 </head>
 <body>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -35,9 +41,9 @@
             </div>
             <hr>
             <!-- Error details -->
-            <p><?= systemErrorMessage ?></p>
+            <p class="pre-line-style"><?= systemErrorMessage ?></p>
             <!-- Additional content -->
-            <p style="white-space: pre-line";><?= customErrorMessage ?></p>
+            <p class="pre-line-style"><?= customErrorMessage ?></p>
         </div>
 
         <!-- Close button -->
@@ -49,5 +55,6 @@
 </body>
 <script>
 </script>
+
 
 </html>

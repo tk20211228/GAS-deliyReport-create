@@ -10,10 +10,15 @@ function findDateIndex(dateString, arr) {
 
 // エラーハンドリングの関数
 function handleErrors(e) {
+  if(e.systemError === "not myprop"){
+        Browser.msgBox('ユーザー名が設定されていません。\\nプロパティ設定で設定後、再度実行してください。', Browser.Buttons.YES);
+        inputMyprop();
+        return;
+  }
   // eがオブジェクトの場合、カスタムエラーとシステムエラーを取得する
-    const customErrorMessage = e.customError || '';
-    const systemErrorMessage = e.systemError || e.message || '';
-    createError(customErrorMessage, systemErrorMessage);
+  const customErrorMessage = e.customError || '';
+  const systemErrorMessage = e.systemError || e.message || '';
+  createError(customErrorMessage, systemErrorMessage);
 }
 
 // Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換する関数
@@ -56,82 +61,77 @@ function recordProgress(taskList, today, formattedDayList, mainSheet, mySheet) {
     }
 }
 
-function CSVStringToArray(strData) {
-    var rows = strData.trim().split("\n");
-    return rows.map(function(row) {
-        var arrayDate = row.split(",");
-        // 二重引用符を取り除く処理
-        arrayDate = arrayDate.map(item => {
-          if(item.startsWith('"') && item.endsWith('"')){
-            return item.slice(1,-1);
-          }
-          // \d{1,2}は、\d（任意の数字）が1回から2回まで現れるパターンにマッチします。例えば、「1」、「12」などが該当しますが、「123」は該当しません（「123」の最初の2文字は該当しますが）
-          let match = item.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
-          if (match) {
-            const year = match[1];
-            // メソッドは、指定された長さになるまで文字列の先頭を特定の文字で埋める。このメソッドは2つの引数を取る。目標の長さ：この例では 2　埋める文字：この例では "0"
-            const month = match[2].padStart(2, "0");
-            const day = match[3].padStart(2, "0");
-            return `${year}-${month}-${day}`;
-          }
-          return item;
-        })
-        return arrayDate;
-    });
+function parseCSVRow(row) {
+    const cleanItem = item => {
+      // 二重引用符を取り除く処理
+      if (item.startsWith('"') && item.endsWith('"')) {
+          return item.slice(1, -1);
+      }
+      // \d{1,2}は、\d（任意の数字）が1回から2回まで現れるパターンにマッチします。例えば、「1」、「12」などが該当しますが、「123」は該当しません（「123」の最初の2文字は該当する）
+      const match = item.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+      if (match) {
+        const year = match[1];
+        // メソッドは、指定された長さになるまで文字列の先頭を特定の文字で埋める。このメソッドは2つの引数を取る。目標の長さ：この例では 2　埋める文字：この例では "0"
+        const month = match[2].padStart(2, "0");
+        const day = match[3].padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+      return item;
+    }
+    //row.split(","): 文字列 row を , で分割して配列を生成
+    //.map(cleanItem): 上記で生成した配列の各要素に cleanItem 関数を適用
+    return row.split(",").map(cleanItem);
 }
 
-/** 配列内で値が重複してないか調べる **/
-function existsSameValue(a){
-  var s = new Set(a);
-  return s.size != a.length;
+function CSVStringToArray(strData) {
+  //strData.trim(): 文字列 strData の先頭および末尾の空白を取り除く
+  //.split("\n"): トリムされた文字列を \n（改行）で分割して配列を生成。これにより、多行の文字データを行ごとの配列に変換
+  //.map(parseCSVRow): 上記で生成した配列の各要素（各行）に parseCSVRow 関数を適用
+    return strData.trim().split("\n").map(parseCSVRow);
 }
 
 function copyTaskTable(mainSheet,mySheet){
-  // console.log("コピー実行");
     mySheet.insertRowsAfter(1, 18);
     mySheet.getRange('2:18').shiftRowGroupDepth(1);
-    const copySheet = mainSheet.getSheetByName("コピー元");
-    const copysheetRange = copySheet.getRange("A1:PN18");
-    copysheetRange.copyTo(mySheet.getRange("A1:PN18"), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
-  // console.log("コピー完了");
+    mainSheet.getSheetByName("コピー元").getRange("A1:PN18")
+        .copyTo(mySheet.getRange("A1:PN18"), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
 }
 
 function uploadFile({content,taskList}) {
-  
   try {
-    // console.log(taskList);
-    var base64Data = content.split(",")[1];
-    // console.log("csvArray",csvArray);
+    const base64Data = content.split(",")[1];
     // Base64データをバイト配列にデコード
-    var decodedBytes = Utilities.base64Decode(base64Data);
-
+    const decodedBytes = Utilities.base64Decode(base64Data);
     // バイト配列を文字列に変換
-    var csvString = Utilities.newBlob(decodedBytes).getDataAsString('Shift_JIS');
-
+    const csvString = Utilities.newBlob(decodedBytes).getDataAsString('Shift_JIS');
     // CSV文字列を配列に変換
-    var csvArray = CSVStringToArray(csvString);
+    const csvArray = CSVStringToArray(csvString);
+
+    const today = formatDate(new Date());
+    const csvArrayTodayIndex = csvArray[0].indexOf(today);
+    if (csvArrayTodayIndex === -1) {
+      throw {
+          customError: `読み込まれたCSVファイルを読み込みましたが、
+          本日[${today}]が入力された値を見つけることができませんでした。
+          ファイルをご確認ください。`,
+          systemError: null
+      };
+    };
 
     const myName = getMyname();
-    // ダイヤログ確認
-    const data = new Date();
-    const today = Utilities.formatDate(data, "Asia/Tokyo", "yyyy-MM-dd");
-    const csvArrayTodayIndex = csvArray[0].indexOf(today);
-
-    if (csvArrayTodayIndex === -1) {
-      throw new Error("Today's date was not found in the CSV array.");
-    };
     const todayTaskTimeList = [];
     const mainSheet = SpreadsheetApp.getActiveSpreadsheet();
     const mySheet = mainSheet.getSheetByName(myName[0]);
     if(!mySheet){
       throw {
           customError: `「${myName[0]}」シートがありません。
-プロパティ設定で「姓」が正しく設定されているか確認してください。
-または、
-シート名が正しく設定されているか確認してください。`,
+          プロパティ設定で「姓」が正しく設定されているか確認してください。
+          または、
+          シート名が正しく設定されているか確認してください。`,
           systemError: null
       };
     }
+ 
 
     let mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
     const mySheetDayList = mySheet.getRange("5:5").getValues().flat();
@@ -175,18 +175,8 @@ function uploadFile({content,taskList}) {
         };
       }
     return taskList;
-
   } catch (e) {
-    console.log(e)
-    if(e.systemError === "not myprop"){
-      Browser.msgBox('ユーザー名が設定されていません。\\nプロパティ設定で設定後、再度実行してください。', Browser.Buttons.YES);
-      inputMyprop();
-      return;
-    }
-    // eがオブジェクトの場合、カスタムエラーとシステムエラーを取得する
-    const customErrorMessage = e.customError || '';
-    const systemErrorMessage = e.systemError || e.message || '';
-    createError(customErrorMessage, systemErrorMessage);
+    handleErrors(e);
   }
 }
 
