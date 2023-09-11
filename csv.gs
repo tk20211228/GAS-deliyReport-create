@@ -97,6 +97,34 @@ function copyTaskTable(mainSheet,mySheet){
         .copyTo(mySheet.getRange("A1:PN18"), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
 }
 
+function validateUploadData(mySheet, csvArray, today, mySheetdayListFormattedArray, taskList) {
+    const todayIndex = csvArray[0].indexOf(today);
+    if (todayIndex === -1) {
+      throw {
+          customError: `読み込まれたCSVファイルを読み込みましたが、
+          本日[${today}]が入力された値を見つけることができませんでした。
+          ファイルをご確認ください。`,
+          systemError: null
+      };
+    }
+    console.log(csvArray)
+    console.log(csvArray.slice(1))
+
+    // 配列の最初の行（0番目の行、おそらくヘッダ行）を除いて残りのデータ行だけを対象
+    csvArray.slice(1).forEach(row => {
+        if (!row[todayIndex]) return;
+        const taskRow = mySheet.getRange("B:B").getValues().flat().indexOf(row[0]) + 4;
+        const taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
+        
+        if (taskRow === 3) {
+            taskList.find(task => task[2] === undefined)[2] = false;
+        } else {
+            taskList.find(task => task[2] === undefined)[2] = true;
+            mySheet.getRange(taskRow,taskCol).setValue(row[todayIndex]).setFontColor("#0000FF");
+        }
+    });
+}
+
 function uploadFile({content,taskList}) {
   try {
     const base64Data = content.split(",")[1];
@@ -179,6 +207,10 @@ function uploadFile({content,taskList}) {
     handleErrors(e);
   }
 }
+
+
+
+
 
 function csvInput() {
   let title = 'CSV入力';
