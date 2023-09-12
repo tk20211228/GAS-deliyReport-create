@@ -97,8 +97,32 @@ function copyTaskTable(mainSheet,mySheet){
         .copyTo(mySheet.getRange("A1:PN18"), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
 }
 
+function uploadFile1({content,taskList}) {
+    try {
+        const base64Data = content.split(",")[1];
+        // Base64データをバイト配列にデコード
+        const decodedBytes = Utilities.base64Decode(base64Data);
+        // バイト配列を文字列に変換
+        const csvString = Utilities.newBlob(decodedBytes).getDataAsString('Shift_JIS');
+        // CSV文字列を配列に変換
+        const csvArray = CSVStringToArray(csvString);
+
+
+        const today = formatDate(new Date());
+        const myName = getMyname();
+        const mainSheet = SpreadsheetApp.getActiveSpreadsheet();
+        const mySheet = mainSheet.getSheetByName(myName[0]);
+        const mySheetdayListFormattedArray = formatDayList(mySheet.getRange("5:5").getValues().flat());
+        validateUploadData(mySheet, csvArray, today, mySheetdayListFormattedArray, taskList);
+
+    } catch (e) {
+        handleErrors(e);
+    }
+}
 function validateUploadData(mySheet, csvArray, today, mySheetdayListFormattedArray, taskList) {
     const todayIndex = csvArray[0].indexOf(today);
+
+    // 変数todayIndexで、配列内に本日の日付がない場合、-1で返される
     if (todayIndex === -1) {
       throw {
           customError: `読み込まれたCSVファイルを読み込みましたが、
@@ -116,6 +140,7 @@ function validateUploadData(mySheet, csvArray, today, mySheetdayListFormattedArr
         const taskRow = mySheet.getRange("B:B").getValues().flat().indexOf(row[0]) + 4;
         const taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
         
+        // 変数taskRowで該当のタスク名がない場合、-1+4＝3 となる。
         if (taskRow === 3) {
             taskList.find(task => task[2] === undefined)[2] = false;
         } else {
