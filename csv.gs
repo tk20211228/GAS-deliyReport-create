@@ -97,7 +97,7 @@ function copyTaskTable(mainSheet,mySheet){
         .copyTo(mySheet.getRange("A1:PN18"), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
 }
 
-function uploadFile1({content,taskList}) {
+function uploadFile({content,taskList}) {
     try {
         const base64Data = content.split(",")[1];
         // Base64データをバイト配列にデコード
@@ -113,7 +113,8 @@ function uploadFile1({content,taskList}) {
         const mainSheet = SpreadsheetApp.getActiveSpreadsheet();
         const mySheet = mainSheet.getSheetByName(myName[0]);
         const mySheetdayListFormattedArray = formatDayList(mySheet.getRange("5:5").getValues().flat());
-        validateUploadData(mySheet, csvArray, today, mySheetdayListFormattedArray, taskList);
+        const res = validateUploadData(mySheet, csvArray, today, mySheetdayListFormattedArray, taskList);
+        return res
 
     } catch (e) {
         handleErrors(e);
@@ -131,14 +132,16 @@ function validateUploadData(mySheet, csvArray, today, mySheetdayListFormattedArr
           systemError: null
       };
     }
-    console.log(csvArray)
-    console.log(csvArray.slice(1))
 
     // 配列の最初の行（0番目の行、おそらくヘッダ行）を除いて残りのデータ行だけを対象
+    const taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
+    const mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
     csvArray.slice(1).forEach(row => {
         if (!row[todayIndex]) return;
-        const taskRow = mySheet.getRange("B:B").getValues().flat().indexOf(row[0]) + 4;
-        const taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
+        const taskRow = mySheetTaskList.indexOf(row[0]) + 4;
+        if (taskCol === 0) {
+          throw new Error(today+"を、進捗シートの”5:5”から見つけることができませんでした。");
+        };
         
         // 変数taskRowで該当のタスク名がない場合、-1+4＝3 となる。
         if (taskRow === 3) {
@@ -148,94 +151,91 @@ function validateUploadData(mySheet, csvArray, today, mySheetdayListFormattedArr
             mySheet.getRange(taskRow,taskCol).setValue(row[todayIndex]).setFontColor("#0000FF");
         }
     });
+    return taskList;
 }
 
-function uploadFile({content,taskList}) {
-  try {
-    const base64Data = content.split(",")[1];
-    // Base64データをバイト配列にデコード
-    const decodedBytes = Utilities.base64Decode(base64Data);
-    // バイト配列を文字列に変換
-    const csvString = Utilities.newBlob(decodedBytes).getDataAsString('Shift_JIS');
-    // CSV文字列を配列に変換
-    const csvArray = CSVStringToArray(csvString);
+// function uploadFile0({content,taskList}) {
+//   try {
+//     const base64Data = content.split(",")[1];
+//     // Base64データをバイト配列にデコード
+//     const decodedBytes = Utilities.base64Decode(base64Data);
+//     // バイト配列を文字列に変換
+//     const csvString = Utilities.newBlob(decodedBytes).getDataAsString('Shift_JIS');
+//     // CSV文字列を配列に変換
+//     const csvArray = CSVStringToArray(csvString);
 
-    const today = formatDate(new Date());
-    const csvArrayTodayIndex = csvArray[0].indexOf(today);
-    if (csvArrayTodayIndex === -1) {
-      throw {
-          customError: `読み込まれたCSVファイルを読み込みましたが、
-          本日[${today}]が入力された値を見つけることができませんでした。
-          ファイルをご確認ください。`,
-          systemError: null
-      };
-    };
+//     const today = formatDate(new Date());
+//     const csvArrayTodayIndex = csvArray[0].indexOf(today);
+//     if (csvArrayTodayIndex === -1) {
+//       throw {
+//           customError: `読み込まれたCSVファイルを読み込みましたが、
+//           本日[${today}]が入力された値を見つけることができませんでした。
+//           ファイルをご確認ください。`,
+//           systemError: null
+//       };
+//     };
 
-    const myName = getMyname();
-    const todayTaskTimeList = [];
-    const mainSheet = SpreadsheetApp.getActiveSpreadsheet();
-    const mySheet = mainSheet.getSheetByName(myName[0]);
-    if(!mySheet){
-      throw {
-          customError: `「${myName[0]}」シートがありません。
-          プロパティ設定で「姓」が正しく設定されているか確認してください。
-          または、
-          シート名が正しく設定されているか確認してください。`,
-          systemError: null
-      };
-    }
+//     const myName = getMyname();
+//     // const todayTaskTimeList = [];
+//     const mainSheet = SpreadsheetApp.getActiveSpreadsheet();
+//     const mySheet = mainSheet.getSheetByName(myName[0]);
+//     if(!mySheet){
+//       throw {
+//           customError: `「${myName[0]}」シートがありません。
+//           プロパティ設定で「姓」が正しく設定されているか確認してください。
+//           または、
+//           シート名が正しく設定されているか確認してください。`,
+//           systemError: null
+//       };
+//     }
  
 
-    let mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
-    const mySheetDayList = mySheet.getRange("5:5").getValues().flat();
-    // 配列を更新して、Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換
-    const mySheetdayListFormattedArray = formatDayList(mySheetDayList);
+//     let mySheetTaskList = mySheet.getRange("B:B").getValues().flat();
+//     const mySheetDayList = mySheet.getRange("5:5").getValues().flat();
+//     // 配列を更新して、Dateオブジェクトを'yyyy-MM-dd'形式の文字列に変換
+//     const mySheetdayListFormattedArray = formatDayList(mySheetDayList);
+//     const taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
+//         // console.log(taskCol);
+//         if (taskCol === 0) {
+//           throw new Error(today+"を、進捗シートの”5:5”から見つけることができませんでした。");
+//         };
 
-      for(i=1;i<csvArray.length;i++){
-        if(!csvArray[i][csvArrayTodayIndex]) continue;
-        let taskRow = mySheetTaskList.indexOf(csvArray[i][0]) + 4 ;
-        // console.log(taskRow);
-        let taskCol = findDateIndex(today, mySheetdayListFormattedArray) + 1;
-        // console.log(taskCol);
-        if (taskCol === 0) {
-          throw new Error(today+"を、進捗シートの”5:5”から見つけることができませんでした。");
-        };
+//       for(i=1;i<csvArray.length;i++){
+//         if(!csvArray[i][csvArrayTodayIndex]) continue;
+//         let taskRow = mySheetTaskList.indexOf(csvArray[i][0]) + 4 ;
+//         // console.log(taskRow);
 
-        todayTaskTimeList.push([
-          csvArray[i][0],
-          csvArray[i][csvArrayTodayIndex],
-          taskRow,
-          taskCol
-          ]);
-        if(taskRow == 3) {
+//         // todayTaskTimeList.push([
+//         //   csvArray[i][0],
+//         //   csvArray[i][csvArrayTodayIndex],
+//         //   taskRow,
+//         //   taskCol
+//         //   ]);
+//         if(taskRow == 3) {
 
-          for(n=0;n<taskList.length;n++){
-            if(taskList[n][2] === undefined ){
-              taskList[n].push(false);
-              break;
-            };
-          };
-        }else{
-          for(n=0;n<taskList.length;n++){
-            if(taskList[n][2] === undefined ){
-              taskList[n].push(true);
-              break;
-            }
-          };
-          mySheet.getRange(taskRow,taskCol)
-            .setValue(csvArray[i][csvArrayTodayIndex])
-            .setFontColor("#0000FF");
-        };
-      }
-    return taskList;
-  } catch (e) {
-    handleErrors(e);
-  }
-}
-
-
-
-
+//           for(n=0;n<taskList.length;n++){
+//             if(taskList[n][2] === undefined ){
+//               taskList[n].push(false);
+//               break;
+//             };
+//           };
+//         }else{
+//           for(n=0;n<taskList.length;n++){
+//             if(taskList[n][2] === undefined ){
+//               taskList[n].push(true);
+//               break;
+//             }
+//           };
+//           mySheet.getRange(taskRow,taskCol)
+//             .setValue(csvArray[i][csvArrayTodayIndex])
+//             .setFontColor("#0000FF");
+//         };
+//       }
+//     return taskList;
+//   } catch (e) {
+//     handleErrors(e);
+//   }
+// }
 
 function csvInput() {
   let title = 'CSV入力';
