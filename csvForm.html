@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="ja">
   <head>
     <base target="_top">
     <?!= inputLib ?>
@@ -26,37 +27,25 @@
         <tbody>
         </tbody>
     </table>
-    <!-- <div class="container mt-2">
-    </div> -->
-    <div class="d-flex justify-content-end"> <!-- このdivを追加 -->
+    <div class="d-flex justify-content-end">
       <button type="button" class="btn btn-outline-primary mx-2" id="createReport">日報作成</button>
       <button type="button" class="btn btn-outline-success mx-2" id="createProgress">進捗表を新規作成</button>
       <button type="button" class="btn btn-outline-secondary mx-2"id="inputGroupFileAddon" onclick="google.script.host.close()">閉じる</button>
     </div>
-
-    <!-- Spinnerを追加 -->
     <div id="overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5);">
       <div class="d-flex justify-content-center align-items-center" style="height:100%;">
-        <!-- <div class="spinner-border text-light" role="status"> -->
         <div class="spinner-border text-light" style="width: 5rem; height: 5rem;" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
       </div>
     </div>
 
-
     <script>
     function formatDateToISO(date) {
         var year = date.getFullYear();
         var month = ('0' + (date.getMonth() + 1)).slice(-2); // +1 because months are 0-based in JS.
         var day = ('0' + date.getDate()).slice(-2);
-        return year + '-' + month + '-' + day;
-    }
-    function formatDateToSlash(date) {
-        var year = date.getFullYear();
-        var month = ('0' + (date.getMonth() + 1)).slice(-2); // +1 because months are 0-based in JS.
-        var day = ('0' + date.getDate()).slice(-2);
-        return year + '/' + month + '/' + day;
+        return `${year}-${month}-${day}`;
     }
 
     function csvToArray(csv) {
@@ -82,6 +71,45 @@
         }
         return result;
     }
+
+    // // リファクタリング結果マージ
+    // function toggleButtons(enable) {
+    //     const buttonIds = ['inputGroupFileAddon', 'createReport', 'createProgress'];
+    //     buttonIds.forEach(id => {
+    //         const btn = document.getElementById(id);
+    //         btn.disabled = !enable;
+    //     });
+    // }
+    // function setupDefaultTasks() {
+    //     const defaultTaskList = [["-", 0.00, false], ["-", 0.00, false], ["-", 0.00, false], ["-", 0.00, false]];
+    //     createTableBody(defaultTaskList);
+    //     toggleButtons(false);
+    // }
+    // function createTableBody(taskList) {
+    //     // ... この関数の中身は変更無し ...
+    // }
+    // function handleFileUpload() {
+    //     // ... この関数の中身は変更無し ...
+    // }
+    // function handleCreateReport() {
+    //     // ... この関数の中身は変更無し ...
+    // }
+    // function handleCreateProgress() {
+    //     // ... この関数の中身は変更無し ...
+    // }
+    // document.addEventListener('DOMContentLoaded', function () {
+    //     setupDefaultTasks();
+
+    //     document.getElementById('files').addEventListener('change', checkFileSelection);
+    //     document.getElementById('inputGroupFileAddon').addEventListener('click', handleFileUpload);
+    //     document.getElementById('createReport').addEventListener('click', handleCreateReport);
+    //     document.getElementById('createProgress').addEventListener('click', handleCreateProgress);
+    // });
+
+
+
+
+
 
     const buttonIds = ['inputGroupFileAddon', 'createReport', 'createProgress'];
     // ファイルの選択状態をチェックしてボタンの活性/非活性を制御する関数
@@ -169,7 +197,6 @@
     // DOMが完全に読み込まれた後に実行されるコード
     let taskList = [["-",0.00,false], ["-",0.00,false], ["-",0.00,false], ["-",0.00,false]];
     document.addEventListener('DOMContentLoaded', function() {
-      // let taskList = [["-",0.00,false], ["-",0.00,false], ["-",0.00,false], ["-",0.00,false]];
       createTableBody(taskList);
       buttonIds.forEach(id => {
           const btn = document.getElementById(id);
@@ -185,10 +212,8 @@
       var fileInput = document.getElementById('files');
       var file = fileInput.files[0];
 
-      var today = new Date();
-      var todayToISO = formatDateToISO(today);
-      console.log(todayToISO);
-      var fileName = todayToISO + "_" + file.name;
+      const today = new Date();
+      const todayToISO = formatDateToISO(today);
 
       var reader = new FileReader();
       reader.onloadend = function(e) {
@@ -231,7 +256,7 @@
               btn.disabled = false; 
           });
           // google.script.host.close();
-        }).uploadFile({content,fileName,taskList});
+        }).uploadFile({content,taskList});
       }
       reader.readAsDataURL(file);
     });

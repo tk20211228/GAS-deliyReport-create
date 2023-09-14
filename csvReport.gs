@@ -128,9 +128,6 @@ function createEmailBody({taskBodyList,myName}) {
     todayActualAll += taskBodyList[i][1];
     tomorrowPlanAll += taskBodyList[i][2];
   }
-  // console.log('todayPlanAll',todayPlanAll);
-  // console.log('todayActualAll',todayActualAll);
-  // console.log('tomorrowPlanAll',tomorrowPlanAll);
 
   return body = `
   各位
@@ -238,26 +235,13 @@ function csvCreateBody({myName,taskList}){
 }
 
 function csvCreateReport({taskList}){
-  // console.log(taskList);
   try {
     const myName = getMyname();
-    // console.log(myName)
-    // if(!myName[1]) {
-    //     throw {
-    //         customError: '<p>プロパティに名前が登録されていません。<br/>管理者にお問い合わせください</p>',
-    //         systemError: null
-    //     };
-    // }
     var bodyItem = csvCreateBody({myName,taskList});
-    console.log('bodyItem',bodyItem);
     let title = bodyItem.subject;
-    // console.log("title",title);
     var output = HtmlService.createTemplateFromFile('csvIndex');
-    // output.bodyItemJSON = JSON.stringify(bodyItem);
     output.bodyItem = bodyItem;
-    // output.inputsub = title;
     output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
-
     var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .setWidth(1100)
     .setHeight(790);
