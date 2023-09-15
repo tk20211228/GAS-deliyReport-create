@@ -41,75 +41,183 @@
     </div>
 
     <script>
-    function formatDateToISO(date) {
-        var year = date.getFullYear();
-        var month = ('0' + (date.getMonth() + 1)).slice(-2); // +1 because months are 0-based in JS.
-        var day = ('0' + date.getDate()).slice(-2);
-        return `${year}-${month}-${day}`;
-    }
+      function formatDateToISO(date) {
+          var year = date.getFullYear();
+          var month = ('0' + (date.getMonth() + 1)).slice(-2); // +1 because months are 0-based in JS.
+          var day = ('0' + date.getDate()).slice(-2);
+          return `${year}-${month}-${day}`;
+      }
 
-    function csvToArray(csv) {
-        var lines = csv.trim().split("\n");
-        var result = [];
-        for (var i = 0; i < lines.length; i++) {
-          var arrayData = lines[i].split(",").map(item => item.trim());
-          // 二重引用符を取り除く処理
-          arrayData = arrayData.map(item => {
-              if (item.startsWith('"') && item.endsWith('"')) {
-                  return item.slice(1, -1);
-              }
-              let match = item.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
-              if (match) {
-                const year = match[1];
-                const month = match[2].padStart(2, "0");
-                const day = match[3].padStart(2, "0");
-                return `${year}-${month}-${day}`;
-              }
-              return item;
-          });
-          result.push(arrayData);
-        }
-        return result;
-    }
+      function csvToArray(csv) {
+          var lines = csv.trim().split("\n");
+          var result = [];
+          for (var i = 0; i < lines.length; i++) {
+            var arrayData = lines[i].split(",").map(item => item.trim());
+            // 二重引用符を取り除く処理
+            arrayData = arrayData.map(item => {
+                if (item.startsWith('"') && item.endsWith('"')) {
+                    return item.slice(1, -1);
+                }
+                let match = item.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+                if (match) {
+                  const year = match[1];
+                  const month = match[2].padStart(2, "0");
+                  const day = match[3].padStart(2, "0");
+                  return `${year}-${month}-${day}`;
+                }
+                return item;
+            });
+            result.push(arrayData);
+          }
+          return result;
+      }
 
-    // // リファクタリング結果マージ
-    // function toggleButtons(enable) {
-    //     const buttonIds = ['inputGroupFileAddon', 'createReport', 'createProgress'];
-    //     buttonIds.forEach(id => {
-    //         const btn = document.getElementById(id);
-    //         btn.disabled = !enable;
-    //     });
-    // }
-    // function setupDefaultTasks() {
-    //     const defaultTaskList = [["-", 0.00, false], ["-", 0.00, false], ["-", 0.00, false], ["-", 0.00, false]];
-    //     createTableBody(defaultTaskList);
+    // // // リファクタリング結果マージ
+    // // --- JavaScriptのコード ---
+    // let taskList = [["-",0.00,false], ["-",0.00,false], ["-",0.00,false], ["-",0.00,false]];
+    // const buttonIds = ['inputGroupFileAddon', 'createReport', 'createProgress'];
+
+    // // ... その他の関数 ...
+
+    // // イベントハンドラの追加
+    // document.addEventListener('DOMContentLoaded', onLoad);
+    // document.getElementById('files').addEventListener('change', checkFileSelection);
+    // document.getElementById('inputGroupFileAddon').addEventListener('click', onFileAddonClick);
+    // document.getElementById('createReport').addEventListener('click', onCreateReportClick);
+    // document.getElementById('createProgress').addEventListener('click', onCreateProgressClick);
+
+    // function onLoad() {
+    //     createTableBody(taskList);
     //     toggleButtons(false);
     // }
+
     // function createTableBody(taskList) {
-    //     // ... この関数の中身は変更無し ...
-    // }
-    // function handleFileUpload() {
-    //     // ... この関数の中身は変更無し ...
-    // }
-    // function handleCreateReport() {
-    //     // ... この関数の中身は変更無し ...
-    // }
-    // function handleCreateProgress() {
-    //     // ... この関数の中身は変更無し ...
-    // }
-    // document.addEventListener('DOMContentLoaded', function () {
-    //     setupDefaultTasks();
+    // const tableBody = document.querySelector('#taskTable tbody');
+    // tableBody.innerHTML = '';
+    // taskList.forEach((task, index) => {
+    //     const row = document.createElement('tr');
+    //     // インデックスを基に行番号を作成
+    //     const th = document.createElement('th');
+    //     th.setAttribute('scope', 'row');
+    //     th.innerText = index + 1;
 
-    //     document.getElementById('files').addEventListener('change', checkFileSelection);
-    //     document.getElementById('inputGroupFileAddon').addEventListener('click', handleFileUpload);
-    //     document.getElementById('createReport').addEventListener('click', handleCreateReport);
-    //     document.getElementById('createProgress').addEventListener('click', handleCreateProgress);
+    //     // 1つ目の要素をセルに追加
+    //     const tdName = document.createElement('td');
+    //     tdName.innerText = task[0];
+
+    //     // 2つ目の要素をセルに追加
+    //     const tdTime = document.createElement('td');
+    //     tdTime.innerText = task[1];
+
+    //     // 3つ目の要素をセルに追加
+    //     const tdTable = document.createElement('td');
+    //     if(task[2] == true){
+    //       tdTable.innerHTML = '<i class="bi bi-check-circle" style="color: #20c997;"></i>';
+
+    //     }else{
+    //       tdTable.innerHTML = '<i class="bi bi-dash-lg"></i>';
+    //     }
+
+    //     // セルを行に追加
+    //     row.appendChild(th);
+    //     row.appendChild(tdName);
+    //     row.appendChild(tdTime);
+    //     row.appendChild(tdTable);
+
+    //     // 行をテーブルに追加
+    //     tableBody.appendChild(row);
     // });
+    // }
 
+    // function toggleButtons(isActive) {
+    //     buttonIds.forEach(id => {
+    //         const btn = document.getElementById(id);
+    //         btn.disabled = !isActive; //trueの場合、ボタンを無効化
+    //     });
+    // }
 
+    // function checkFileSelection() {
+    //     const fileInput = document.getElementById('files');
+    //     const btn = document.getElementById('inputGroupFileAddon');
+    //     btn.disabled = (fileInput.files.length === 0);
+    // }
 
+    // function onFileAddonClick() {
+    //     toggleButtons(false);
+    //     const fileInput = document.getElementById('files');
+    //     const file = fileInput.files[0];
 
+    //     const today = new Date();
+    //     const todayToISO = formatDateToISO(today);
 
+    //     var reader = new FileReader();
+    //     reader.onloadend = function(e) {
+    //       var content = reader.result;
+
+    //       // base64部分のみを取得
+    //       var base64Data = content.split(',')[1];
+    //       // base64をデコードしてUint8Arrayを取得
+    //       var decodedData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    //       const encoding = Encoding.detect(decodedData);
+    //       // console.log(encoding);
+    //       var charArray = Encoding.convert(decodedData, {
+    //         from: encoding,
+    //         to: 'UNICODE',
+    //         type: 'string'
+    //         });
+
+    //       var csvArraryData = csvToArray(charArray);
+    //       console.log(csvArraryData);
+    //       let index = csvArraryData[0].indexOf(todayToISO);
+    //       taskList.length = 0; // taskListを空にする
+    //       for(i=1;i<csvArraryData.length;i++){
+    //         if(!csvArraryData[i][index]) continue;
+    //         taskList.push([csvArraryData[i][0],csvArraryData[i][index]]);
+    //       }
+    //       createTableBody(taskList);
+
+    //       // Spinnerを表示
+    //       document.getElementById('overlay').style.display = 'block';
+    //       google.script.run.withSuccessHandler(function (res){
+    //         taskList = res;
+    //         createTableBody(taskList);
+    //         // 関数を呼び出して合計行を追加
+    //         addTotalRow();
+    //         // await new Promise(r => setTimeout(r, 10000)); // 3秒間のスリープ
+    //         document.getElementById('overlay').style.display = 'none';
+    //         toggleButtons(true);
+    //         // google.script.host.close();
+    //       }).uploadFile({content,taskList});
+    //     }
+    //     reader.readAsDataURL(file);
+    // }
+
+    // function onCreateReportClick() {
+    //   toggleButtons(false);
+    //   document.getElementById('overlay').style.display = 'block';// Spinnerを表示
+    //   google.script.run.withSuccessHandler(function (){
+    //     document.getElementById('overlay').style.display = 'none';
+    //     buttonIds.forEach(id => {
+    //         const btn = document.getElementById(id);
+    //         btn.disabled = false; 
+    //     });
+    //   }).csvCreateReport({taskList});
+    // }
+
+    // function onCreateProgressClick() {
+    //   toggleButtons(false);
+    //   document.getElementById('overlay').style.display = 'block';// Spinnerを表示
+    //       google.script.run.withSuccessHandler(function (res){
+    //         taskList = res;
+    //         createTableBody(taskList);
+    //         addTotalRow();
+    //         document.getElementById('overlay').style.display = 'none';
+    //         buttonIds.forEach(id => {
+    //             const btn = document.getElementById(id);
+    //             btn.disabled = false; 
+    //         });
+    //       }).csvCreateProgress({taskList});
+    // }
 
     const buttonIds = ['inputGroupFileAddon', 'createReport', 'createProgress'];
     // ファイルの選択状態をチェックしてボタンの活性/非活性を制御する関数
@@ -297,7 +405,7 @@
                 btn.disabled = false; 
             });
           }).csvCreateProgress({taskList});
-    });
+    }); 
 
     </script>
 
