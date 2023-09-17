@@ -94,7 +94,8 @@ function copyTaskTable(mainSheet,mySheet){
     mySheet.insertRowsAfter(1, 18);
     mySheet.getRange('2:18').shiftRowGroupDepth(1);
     mainSheet.getSheetByName("コピー元").getRange("A1:PN18")
-        .copyTo(mySheet.getRange("A1:PN18"), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
+        .copyTo(mySheet.getRange("A1:PN18"), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false)
+    mySheet.getRange("B6").activate();
 }
 
 function uploadFile({content,taskList}) {
