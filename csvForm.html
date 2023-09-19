@@ -30,7 +30,7 @@
     <div class="d-flex justify-content-end my-2">
       <button type="button" class="btn btn-outline-primary mx-2" id="createReport">日報作成</button>
       <button type="button" class="btn btn-outline-success mx-2" id="createProgress">進捗表を新規作成</button>
-      <button type="button" class="btn btn-outline-secondary mx-2"id="inputGroupFileAddon" onclick="google.script.host.close()">閉じる</button>
+      <button type="button" class="btn btn-outline-secondary mx-2" onclick="google.script.host.close()">閉じる</button>
     </div>
     <div id="overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5);">
       <div class="d-flex justify-content-center align-items-center" style="height:100%;">
@@ -44,73 +44,68 @@
 
     // --- JavaScriptのコード ---
     let taskList = [["-",0.00,false], ["-",0.00,false], ["-",0.00,false], ["-",0.00,false]];
-    const buttonIds = ['inputGroupFileAddon', 'createReport', 'createProgress'];
+    const BUTTON_IDS = ['inputGroupFileAddon', 'createReport', 'createProgress'];
+    const FILE_INPUT_ID = 'files';
+    const TABLE_BODY_SELECTOR = '#taskTable tbody';
+    const OVERLAY_ID = 'overlay';
 
-    // ... その他の関数 ...
-      function formatDateToISO(date) {
-          var year = date.getFullYear();
-          var month = ('0' + (date.getMonth() + 1)).slice(-2); // +1 because months are 0-based in JS.
-          var day = ('0' + date.getDate()).slice(-2);
-          return `${year}-${month}-${day}`;
-      }
+    function formatDateToISO(date) {
+        var year = date.getFullYear();
+        var month = ('0' + (date.getMonth() + 1)).slice(-2); // +1 because months are 0-based in JS.
+        var day = ('0' + date.getDate()).slice(-2);
+        return `${year}-${month}-${day}`;
+    }
 
-      function csvToArray(csv) {
-          var lines = csv.trim().split("\n");
-          var result = [];
-          for (var i = 0; i < lines.length; i++) {
-            var arrayData = lines[i].split(",").map(item => item.trim());
-            // 二重引用符を取り除く処理
-            arrayData = arrayData.map(item => {
-                if (item.startsWith('"') && item.endsWith('"')) {
-                    return item.slice(1, -1);
-                }
-                let match = item.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
-                if (match) {
-                  const year = match[1];
-                  const month = match[2].padStart(2, "0");
-                  const day = match[3].padStart(2, "0");
-                  return `${year}-${month}-${day}`;
-                }
-                return item;
-            });
-            result.push(arrayData);
-          }
-          return result;
-      }
-
-      // テーブル内の工数を合計する関数
-      function sumHours() {
-          let total = 0;
-          // :first-child は子要素の一番最初に適応
-          // :last-child は子要素の一番最後に適応
-          // :nth-last-child(n) は子要素の最後からn番目に適応
-          const hoursElements = document.querySelectorAll("#taskTable tbody td:nth-last-child(2)");
-          
-          hoursElements.forEach(element => {
-              total += parseFloat(element.innerText);
+    function csvToArray(csv) {
+        var lines = csv.trim().split("\n");
+        var result = [];
+        for (var i = 0; i < lines.length; i++) {
+          var arrayData = lines[i].split(",").map(item => item.trim());
+          // 二重引用符を取り除く処理
+          arrayData = arrayData.map(item => {
+              if (item.startsWith('"') && item.endsWith('"')) {
+                  return item.slice(1, -1);
+              }
+              let match = item.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+              if (match) {
+                const year = match[1];
+                const month = match[2].padStart(2, "0");
+                const day = match[3].padStart(2, "0");
+                return `${year}-${month}-${day}`;
+              }
+              return item;
           });
+          result.push(arrayData);
+        }
+        return result;
+    }
 
-          return total.toFixed(2);  // 小数点第2位までの値を返す
-      }
+    // テーブル内の工数を合計する関数
+    function sumHours() {
+        let total = 0;
+        // :first-child は子要素の一番最初に適応
+        // :last-child は子要素の一番最後に適応
+        // :nth-last-child(n) は子要素の最後からn番目に適応
+        const hoursElements = document.querySelectorAll("#taskTable tbody td:nth-last-child(2)");
+        
+        hoursElements.forEach(element => {
+            total += parseFloat(element.innerText);
+        });
 
-      // 既存のテーブルに合計行を追加
-      function addTotalRow() {
-          const total = sumHours();
-          const tbody = document.querySelector("#taskTable tbody");
-          const newRow = document.createElement("tr");
-          newRow.innerHTML = `
-              <th scope="row" colspan="2">合計</th>
-              <td>${total}</td>
-          `;
-          tbody.appendChild(newRow);
-      }
+        return total.toFixed(2);  // 小数点第2位までの値を返す
+    }
 
-    // イベントハンドラの追加
-    document.addEventListener('DOMContentLoaded', onLoad);
-    document.getElementById('files').addEventListener('change', checkFileSelection);
-    document.getElementById('inputGroupFileAddon').addEventListener('click', onFileAddonClick);
-    document.getElementById('createReport').addEventListener('click', onCreateReportClick);
-    document.getElementById('createProgress').addEventListener('click', onCreateProgressClick);
+    // 既存のテーブルに合計行を追加
+    function addTotalRow() {
+        const total = sumHours();
+        const tbody = document.querySelector(TABLE_BODY_SELECTOR);
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+            <th scope="row" colspan="2">合計</th>
+            <td>${total}</td>
+        `;
+        tbody.appendChild(newRow);
+    }
 
     function onLoad() {
         createTableBody(taskList);
@@ -118,7 +113,7 @@
     }
 
     function createTableBody(taskList) {
-    const tableBody = document.querySelector('#taskTable tbody');
+    const tableBody = document.querySelector(TABLE_BODY_SELECTOR);
     tableBody.innerHTML = '';
     taskList.forEach((task, index) => {
         const row = document.createElement('tr');
@@ -156,21 +151,21 @@
     }
 
     function toggleButtons(isActive) {
-        buttonIds.forEach(id => {
+        BUTTON_IDS.forEach(id => {
             const btn = document.getElementById(id);
             btn.disabled = !isActive; //trueの場合、ボタンを無効化
         });
     }
 
     function checkFileSelection() {
-        const fileInput = document.getElementById('files');
+        const fileInput = document.getElementById(FILE_INPUT_ID);
         const btn = document.getElementById('inputGroupFileAddon');
         btn.disabled = (fileInput.files.length === 0);
     }
 
     function onFileAddonClick() {
         toggleButtons(false);
-        const fileInput = document.getElementById('files');
+        const fileInput = document.getElementById(FILE_INPUT_ID);
         const file = fileInput.files[0];
 
         const today = new Date();
@@ -203,14 +198,13 @@
           createTableBody(taskList);
 
           // Spinnerを表示
-          document.getElementById('overlay').style.display = 'block';
+          document.getElementById(OVERLAY_ID).style.display = 'block';
           google.script.run.withSuccessHandler(function (res){
             taskList = res;
             createTableBody(taskList);
             // 関数を呼び出して合計行を追加
             addTotalRow();
-            // await new Promise(r => setTimeout(r, 10000)); // 3秒間のスリープ
-            document.getElementById('overlay').style.display = 'none';
+            document.getElementById(OVERLAY_ID).style.display = 'none';
             toggleButtons(true);
             // google.script.host.close();
           }).uploadFile({content,taskList});
@@ -220,10 +214,10 @@
 
     function onCreateReportClick() {
       toggleButtons(false);
-      document.getElementById('overlay').style.display = 'block';// Spinnerを表示
+      document.getElementById(OVERLAY_ID).style.display = 'block';// Spinnerを表示
       google.script.run.withSuccessHandler(function (){
-        document.getElementById('overlay').style.display = 'none';
-        buttonIds.forEach(id => {
+        document.getElementById(OVERLAY_ID).style.display = 'none';
+        BUTTON_IDS.forEach(id => {
             const btn = document.getElementById(id);
             btn.disabled = false; 
         });
@@ -232,18 +226,25 @@
 
     function onCreateProgressClick() {
       toggleButtons(false);
-      document.getElementById('overlay').style.display = 'block';// Spinnerを表示
+      document.getElementById(OVERLAY_ID).style.display = 'block';// Spinnerを表示
           google.script.run.withSuccessHandler(function (res){
             taskList = res;
             createTableBody(taskList);
             addTotalRow();
-            document.getElementById('overlay').style.display = 'none';
-            buttonIds.forEach(id => {
+            document.getElementById(OVERLAY_ID).style.display = 'none';
+            BUTTON_IDS.forEach(id => {
                 const btn = document.getElementById(id);
                 btn.disabled = false; 
             });
           }).csvCreateProgress({taskList});
     }
+
+    // イベントハンドラ
+    document.addEventListener('DOMContentLoaded', onLoad);
+    document.getElementById(FILE_INPUT_ID).addEventListener('change', checkFileSelection);
+    document.getElementById(BUTTON_IDS[0]).addEventListener('click', onFileAddonClick);
+    document.getElementById(BUTTON_IDS[1]).addEventListener('click', onCreateReportClick);
+    document.getElementById(BUTTON_IDS[2]).addEventListener('click', onCreateProgressClick);
 
     </script>
 
