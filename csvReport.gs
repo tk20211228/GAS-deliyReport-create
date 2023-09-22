@@ -67,6 +67,7 @@ function taskBody({activeSheet,taskRow,taskCol}){
     const todayPlanUsingTimeProgress      = formatNumberToFixed(selectAllPlanVlales[11][todayAchievementNo]* 100);//工数進捗　(計画)
     const todayActualTimeProgress         = formatNumberToFixed(selectAllPlanVlales[12][todayAchievementNo]* 100);//工数進捗　(実績)
     const todayMemo                  = selectAllPlanVlales[13][todayAchievementNo].replace(/\n/g, "\n　")+ "\n";          // メモ　正規表現（/\n/g）を用いて文字列内のすべての改行コード（\n）を検索
+    console.log(todayMemo);
 
     // const tomorrowPlanUsingItem      = Number(selectAllPlanVlales[1][nexstdayAchievementNo]);// 予定項目数  計画(明日)
     // const tomorrowPlanUsingTime      = Number(selectAllPlanVlales[2][nexstdayAchievementNo]);// 予定工数   計画(明日)
@@ -239,6 +240,7 @@ function csvCreateReport({taskList}){
     var output = HtmlService.createTemplateFromFile('csvIndex');
     output.bodyItem = bodyItem;
     output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
+    output.taskListString = JSON.stringify(taskList);  // taskListをJSON文字列に変換
     var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .setWidth(1100)
     .setHeight(790);

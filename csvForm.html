@@ -187,8 +187,14 @@
 
     }
 
-    function updateTaskListFromCSV(csvArrayData, todayToISO) {
-
+    function extractTaskListFromCSV(csvArrayData, todayToISO) {
+      let index = csvArrayData[0].indexOf(todayToISO);
+      let tasks = [];
+      for(let i=1; i<csvArrayData.length; i++){
+          if(!csvArrayData[i][index]) continue;
+          tasks.push([csvArrayData[i][0], csvArrayData[i][index]]);
+      }
+      return tasks;
     }
 
     function onFileAddonClick() {
@@ -201,31 +207,28 @@
           const content = reader.result;
           const charArray = decodeBase64Data(content);
 
-          var csvArraryData = csvToArray(charArray);
-          // console.log(csvArraryData);
-          let index = csvArraryData[0].indexOf(todayToISO);
+          let csvArrayData = csvToArray(charArray);
           taskList.length = 0; // taskListを空にする
-          for(i=1;i<csvArraryData.length;i++){
-            if(!csvArraryData[i][index]) continue;
-            taskList.push([csvArraryData[i][0],csvArraryData[i][index]]);
-          }
+          taskList.push(...extractTaskListFromCSV(csvArrayData, todayToISO));
+
           createTableBody(taskList);
           toggleOverlayDisplay(true);
-          // document.getElementById(OVERLAY_ID).style.display = 'block';
-          google.script.run.withSuccessHandler(function (res){
-            taskList = res;
-            createTableBody(taskList);
-            // 関数を呼び出して合計行を追加
-            addTotalRow();
-            toggleOverlayDisplay(false);
-            toggleButtons(true);
-            // google.script.host.close();
-          }).uploadFile({content,taskList});
+          google.script.run
+              .withSuccessHandler(function (res){
+                  taskList = res;
+                  createTableBody(taskList);
+                  // 関数を呼び出して合計行を追加
+                  addTotalRow();
+                  toggleOverlayDisplay(false);
+                  toggleButtons(true);
+                })  
+              .uploadFile({content,taskList});
         }
         reader.readAsDataURL(file);
     }
 
     function onCreateReportClick() {
+      console.log(taskList)
       toggleButtons(false);
       toggleOverlayDisplay(true);
       google.script.run.withSuccessHandler(function (){

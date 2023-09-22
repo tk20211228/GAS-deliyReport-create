@@ -43,7 +43,8 @@
               <button id="createGmail" type="button" class="btn btn-outline-primary m-2"> 
                 Gmailの下書きに出力する
               </button>
-              <button type="button" class="btn btn-outline-success m-2" id="textcope" >テキストを全てコピーする</button>
+              <button type="button" class="btn btn-outline-success m-2" id="textcopy" >テキストを全てコピーする</button>
+              <button id="reCreateReport" type="button" class="btn btn-outline-info m-2">日報を再出力</button>
 
               <button type="button" class="btn btn-outline-secondary m-2" onclick="google.script.host.close()">閉じる</button>
             </div>
@@ -52,37 +53,47 @@
      </div>
     </div>
     <script>
-      document.getElementById('createGmail').addEventListener('click',function(){
+      const OVERLAY_ID = 'overlay';
+
+      function toggleOverlayDisplay(isVisible) {
+          const overlay = document.getElementById(OVERLAY_ID);
+          overlay.style.display = isVisible ? 'block' : 'none';
+      }
+
+      function reCreateReport(){
+        const taskListString = '<?= taskListString ?>';  // JSON文字列を取得
+        const taskList = JSON.parse(taskListString);    // JSON文字列をオブジェクトに変換
+        toggleOverlayDisplay(true);
+        google.script.run.withSuccessHandler(function (){
+          toggleOverlayDisplay(false);
+          BUTTON_IDS.forEach(id => {
+              const btn = document.getElementById(id);
+              btn.disabled = false; 
+          });
+        }).csvCreateReport({taskList});
+      }
+
+      function createReport(){
         const body    = document.getElementsByTagName("textarea")[0].value;
         const subject = document.getElementById('subject').value;
         const to      = document.getElementById('destination').value;
-
-        document.getElementById('overlay').style.display = 'block';
-        var buttons = document.querySelectorAll('.btn')
-        buttons.forEach(function (button) {
-          button.setAttribute('disabled', 'disabled');
-        });
-                
-        // console.log(body,subject,to);
-        google.script.run.withSuccessHandler(
-          // async 
-          function(){
-          // await new Promise(r => setTimeout(r, 10000)); // 3秒間のスリープ
-          document.getElementById('overlay').style.display = 'none';
-          var buttons = document.querySelectorAll('.btn');
-          buttons.forEach(function (button) {
-            button.removeAttribute('disabled');
-          });
+        toggleOverlayDisplay(true);
+        google.script.run.withSuccessHandler(function(){
+          toggleOverlayDisplay(false);
           // google.script.host.close();
-
           }).createGmail(to,subject,body);
-      })
+      }
 
-      document.getElementById('textcope').addEventListener('click',function(){
+      function textCopy(){
         const text = document.getElementsByTagName("textarea")[0];
         text.select();
         document.execCommand("copy");
-      })
+      }
+
+      document.getElementById("reCreateReport").addEventListener("click",reCreateReport);
+      document.getElementById('createGmail').addEventListener('click',createReport);
+      document.getElementById('textcopy').addEventListener('click',textCopy)
+
     </script>
 
     </div>
