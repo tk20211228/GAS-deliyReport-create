@@ -1,6 +1,7 @@
 function formatNumberToFixed(value) {
   if (typeof value === 'number') {
-    return value.toFixed(2);
+    if(value == 100) return value;
+    return value.toFixed(1);
   } else if (value === null || value === undefined) {
     return "0.00"; // null や undefined の場合に返すデフォルト値
   }
@@ -100,7 +101,8 @@ function taskBody({activeSheet,taskRow,taskCol}){
 　予定進捗率     ：${todayPlanUsingItemProgress}%[${todayTotalPlanUsingItem}/${totalItems}]
 　予定工数進捗   ：${todayPlanUsingTimeProgress}%[${todayTotalPlanUsingTime}/${planTotalTime}h]
 　予定実施項目数 ：${todayPlanUsingItem}項目[${todayPlanUsingTime}h]
-　${todayMemo}`;
+`;
+
     const todayActual = `
 ・${taskName}
 　開始予定       ：${startDay}
