@@ -43,7 +43,7 @@
     <script>
 
     // --- JavaScriptのコード ---
-    let taskList = [["-",0.00,false], ["-",0.00,false], ["-",0.00,false], ["-",0.00,false]];
+    let taskList = [["-",0,false], ["-",0,false], ["-",0,false], ["-",0,false]];
     const BUTTON_IDS = ['inputGroupFileAddon', 'createReport', 'createProgress'];
     const FILE_INPUT_ID = 'files';
     const TABLE_BODY_SELECTOR = '#taskTable tbody';
@@ -133,7 +133,7 @@
 
         // 2つ目の要素をセルに追加
         const tdTime = document.createElement('td');
-        tdTime.innerText = task[1];
+        tdTime.innerText = parseFloat(task[1]).toFixed(2);
 
         // 3つ目の要素をセルに追加
         const tdTable = document.createElement('td');
