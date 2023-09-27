@@ -183,10 +183,6 @@
       return charArray;
     }
 
-    function parseCSVContent(content) {
-
-    }
-
     function extractTaskListFromCSV(csvArrayData, todayToISO) {
       let index = csvArrayData[0].indexOf(todayToISO);
       let tasks = [];
@@ -228,7 +224,7 @@
     }
 
     function onCreateReportClick() {
-      console.log(taskList)
+      // console.log(taskList)
       toggleButtons(false);
       toggleOverlayDisplay(true);
       google.script.run.withSuccessHandler(function (){

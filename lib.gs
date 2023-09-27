@@ -87,6 +87,7 @@ function allpropkill(){
 function getMyname(){
   // 実行ユーザーのメールアドレス取得
   var userEmail = Session.getActiveUser().getEmail();
+  console.log(userEmail);
   var familyName = getProp(userEmail);
   var fullName = getProp(familyName);
 

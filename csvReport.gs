@@ -209,8 +209,8 @@ function csvCreateBody({myName,taskList}){
     });
 
     const taskCol = findDateIndex(formatDateToISO, mySheetdayListFormattedArray) + 1 ;
-    console.log(formatDateToISO);
-    console.log(taskCol);
+    // console.log(formatDateToISO);
+    // console.log(taskCol);
     if (taskCol === -1) {
       throw {
           customError: `「${formatDateToISO}」を、進捗「${myName[0]}」シートの”5:5”から見つけることができませんでした。`,
