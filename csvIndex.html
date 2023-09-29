@@ -48,8 +48,8 @@
                 </div>
                 <div class="col-12 mt-2">
                 <div class="wrapper">
-                    <div class="col-9 m-2">
-                      <textarea class="form-control form-control-lg" id="report" style="height:550px"><?= bodyItem.reportBody ?></textarea>
+                    <div class="col-6 m-2">
+                      <textarea class="form-control form-control-lg" id="report" style="height:450px"><?= bodyItem.reportBody ?></textarea>
                     </div>
                     <div class="col-3 m-2">
                       <div>[メール設定]</div>
@@ -129,6 +129,7 @@
 
     <script>
       const OVERLAY_ID = 'overlay';
+      var notyf;
 
       function toggleOverlayDisplay(isVisible) {
           const overlay = document.getElementById(OVERLAY_ID);
@@ -150,7 +151,15 @@
 
       function createReport(){
         formCheck();
-        initializeNotyf();
+        // notyf.open({
+        //   type: 'warning',
+        //   message: 'Send us <b>an email</b> to get support'
+        // });
+        // notyf.open({
+        //   type: 'error',
+        //   message: 'Send us <b>an email</b> to get support'
+        // });
+         notyf.success('<b>実行中</b><br />「Gmailの下書き」を出力しています。');
         const body    = document.getElementsByTagName("textarea")[0].value;
         const subject = document.getElementById('subject').value;
         const to      = document.getElementById('destination').value;
@@ -170,18 +179,44 @@
 
       // https://www.single-life.tokyo/javascript%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%80%8Enotyf%E3%80%8F%E3%81%A7%E3%80%8C%E3%83%88%E3%83%BC%E3%82%B9%E3%83%88%E9%80%9A%E7%9F%A5%E3%80%8D%EF%BC%88%E9%80%9A%E7%9F%A5%E3%83%90/
       function initializeNotyf() {
-         var notyf1 = new Notyf();
-         notyf1.success('<b>実行中</b><br />「Gmailの下書き」を出力しています。');
+          notyf = new Notyf({
+          duration: 3000,
+          position: {
+            x: 'right',
+            y: 'top',
+          },
+          types: [
+            {
+              type: 'warning',
+              background: 'orange',
+              icon: {
+                className: 'material-icons',
+                tagName: 'i',
+                text: 'warning'
+              }
+            },
+            {
+              type: 'error',
+              background: 'indianred',
+              duration: 10000,
+              dismissible: true
+            }
+          ]
+         });
       }
+      window.onload = initializeNotyf();
 
       function formCheck(){
         const formChecks = document.querySelectorAll('.form-check input');
         let checkArray = [];
-        formChecks.forEach(check => {checkArray.push([check.value,check.checked])});
+        formChecks.forEach(check => checkArray.push([check.value,check.checked]));
         // formChecks.forEach(function(check) {
         //   checkedArray.push(check.checked);
         // });
         console.log(checkArray);
+        checkArray.forEach(checked => {
+          console.log(checked);
+        })
       }
 
       document.getElementById("reCreateReport").addEventListener("click",reCreateReport);
