@@ -74,13 +74,13 @@
                       <hr>
                       <div>[本日の予定]</div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="予定のタスク" id="todayTaskPlanCheck">
+                        <input class="form-check-input" type="checkbox" value="『予定のタスク』" id="todayTaskPlanCheck">
                         <label class="form-check-label" for="todayTaskPlanCheck">
                           記載タスクに問題はないか。
                         </label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="予定の合計工数" id="todayTaskTimePlan">
+                        <input class="form-check-input" type="checkbox" value="『予定の合計工数』" id="todayTaskTimePlan">
                         <label class="form-check-label" for="todayTaskTimePlan">
                           工数の合計に問題ないか。
                         </label>
@@ -88,13 +88,13 @@
                       <hr>
                       <div>[本日の実績]</div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="実績のタスク" id="todayTaskCheck">
+                        <input class="form-check-input" type="checkbox" value="『実績のタスク』" id="todayTaskCheck">
                         <label class="form-check-label" for="todayTaskCheck">
                           記載タスクに問題はないか。
                         </label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="実績の合計工数" id="todayTaskTimeCheck">
+                        <input class="form-check-input" type="checkbox" value="『実績の合計工数』" id="todayTaskTimeCheck">
                         <label class="form-check-label" for="todayTaskTimeCheck">
                           工数の合計に問題ないか。
                         </label>
@@ -102,13 +102,13 @@
                       <hr>
                       <div>[明日の予定]</div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="明日のタスク" id="tomorrowTaskCheck">
-                        <label class="form-check-label" for="tomorrowdTaskCheck">
+                        <input class="form-check-input" type="checkbox" value="『明日のタスク』" id="tomorrowTaskCheck">
+                        <label class="form-check-label" for="tomorrowTaskCheck">
                           記載タスクに問題はないか。
                         </label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="明日の合計工数" id="tomorrowTaskTimeCheck">
+                        <input class="form-check-input" type="checkbox" value="『明日の合計工数』" id="tomorrowTaskTimeCheck">
                         <label class="form-check-label" for="tomorrowTaskTimeCheck">
                           工数の合計に問題ないか。
                         </label>
@@ -150,16 +150,9 @@
       }
 
       function createReport(){
-        formCheck();
-        // notyf.open({
-        //   type: 'warning',
-        //   message: 'Send us <b>an email</b> to get support'
-        // });
-        // notyf.open({
-        //   type: 'error',
-        //   message: 'Send us <b>an email</b> to get support'
-        // });
-         notyf.success('<b>実行中</b><br />「Gmailの下書き」を出力しています。');
+        const checkResult = formCheck();
+        if(!checkResult) return;
+        notyf.success('<b>実行中</b><br />「Gmailの下書き」を出力しています。');
         const body    = document.getElementsByTagName("textarea")[0].value;
         const subject = document.getElementById('subject').value;
         const to      = document.getElementById('destination').value;
@@ -198,7 +191,7 @@
             {
               type: 'error',
               background: 'indianred',
-              duration: 10000,
+              duration: 300000,
               dismissible: true
             }
           ]
@@ -207,16 +200,21 @@
       window.onload = initializeNotyf();
 
       function formCheck(){
+        notyf.dismissAll();
         const formChecks = document.querySelectorAll('.form-check input');
         let checkArray = [];
         formChecks.forEach(check => checkArray.push([check.value,check.checked]));
-        // formChecks.forEach(function(check) {
-        //   checkedArray.push(check.checked);
-        // });
-        console.log(checkArray);
-        checkArray.forEach(checked => {
-          console.log(checked);
+        let checkResult = true;
+        checkArray.forEach(check => {
+          if(!check[1]){
+            notyf.open({
+              type: 'error',
+              message: `<p>${check[0]}<br>に確認チェックがありません。</p>`
+            });
+            checkResult = false;
+          }
         })
+        return checkResult;
       }
 
       document.getElementById("reCreateReport").addEventListener("click",reCreateReport);
