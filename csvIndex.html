@@ -137,30 +137,42 @@
       }
 
       function reCreateReport(){
+        notyf.dismissAll();
+        const notification = notyf.open({
+          type: 'warning',
+          message: '<b>実行中</b><br/>「日報」を再出力しています。'
+          });
         const taskListString = '<?= taskListString ?>';  // JSON文字列を取得
         const taskList = JSON.parse(taskListString);    // JSON文字列をオブジェクトに変換
         toggleOverlayDisplay(true);
         google.script.run.withSuccessHandler(function (){
           toggleOverlayDisplay(false);
-          BUTTON_IDS.forEach(id => {
-              const btn = document.getElementById(id);
-              btn.disabled = false; 
-          });
-        }).csvCreateReport({taskList});
+          notyf.dismiss(notification);
+          notyf.success('<b>完了</b><br/>「日報」を出力します。');
+          // BUTTON_IDS.forEach(id => {
+          //     const btn = document.getElementById(id);
+          //     btn.disabled = false; 
+          // });
+        })
+        .csvCreateReport({taskList});
       }
 
       function createReport(){
         const checkResult = formCheck();
         if(!checkResult) return;
-        notyf.success('<b>実行中</b><br />「Gmailの下書き」を出力しています。');
+        const notification = notyf.open({
+          type: 'warning',
+          message: '<b>実行中</b><br/>「Gmailの下書き」を出力しています。'
+          });
         const body    = document.getElementsByTagName("textarea")[0].value;
         const subject = document.getElementById('subject').value;
         const to      = document.getElementById('destination').value;
         toggleOverlayDisplay(true);
         google.script.run.withSuccessHandler(function(){
           toggleOverlayDisplay(false);
+          notyf.dismiss(notification);
+          notyf.success('<b>完了</b><br/>「Gmailの下書き」が完了しました。');
           // google.script.host.close();
-          
           }).createGmail(to,subject,body);
       }
 
@@ -168,12 +180,14 @@
         const text = document.getElementsByTagName("textarea")[0];
         text.select();
         document.execCommand("copy");
+        notyf.dismissAll();
+        notyf.success('<b>完了</b><br/>クリップボードに「日報」をコピーしました。');
       }
 
       // https://www.single-life.tokyo/javascript%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%80%8Enotyf%E3%80%8F%E3%81%A7%E3%80%8C%E3%83%88%E3%83%BC%E3%82%B9%E3%83%88%E9%80%9A%E7%9F%A5%E3%80%8D%EF%BC%88%E9%80%9A%E7%9F%A5%E3%83%90/
       function initializeNotyf() {
           notyf = new Notyf({
-          duration: 3000,
+          duration: 5000,
           position: {
             x: 'right',
             y: 'top',
@@ -182,10 +196,10 @@
             {
               type: 'warning',
               background: 'orange',
+              duration: 150000,
               icon: {
-                className: 'material-icons',
-                tagName: 'i',
-                text: 'warning'
+                className: 'spinner-border text-light'
+                // tagName: 'i'
               }
             },
             {
@@ -209,7 +223,7 @@
           if(!check[1]){
             notyf.open({
               type: 'error',
-              message: `<p>${check[0]}<br>に確認チェックがありません。</p>`
+              message: `<b>${check[0]}</b>に確認チェックがありません。`
             });
             checkResult = false;
           }
