@@ -5,7 +5,7 @@
     <base target="_top">
     <?!= inputLib ?>
     <style>
-        /* #overlay {
+        #overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -17,7 +17,7 @@
         .spinner-grow {
             width: 9rem;
             height: 9rem;
-        } */
+        }
         .form-section {
             background: #edf0ff;
         }
@@ -31,10 +31,9 @@
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 
     <!-- Spinnerを追加 -->
-    <div id="overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5);">
+    <div id="overlay">
       <div class="d-flex justify-content-center align-items-center" style="height:100%;">
-        <!-- <div class="spinner-border text-light" role="status"> -->
-        <div class="spinner-grow text-light" style="width: 9rem; height: 9rem;" role="status">
+        <div class="spinner-grow text-light" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
       </div>
@@ -90,13 +89,13 @@
                       <hr>
                       <div>[本日の予定]</div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="『予定のタスク』" id="todayTaskPlanCheck">
+                        <input class="form-check-input" type="checkbox" value="「予定のタスク名」" id="todayTaskPlanCheck">
                         <label class="form-check-label" for="todayTaskPlanCheck">
-                          記載タスクに問題はないか。
+                          タスク名に問題はないか。
                         </label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="『予定の合計工数』" id="todayTaskTimePlan">
+                        <input class="form-check-input" type="checkbox" value="「予定の合計工数」" id="todayTaskTimePlan">
                         <label class="form-check-label" for="todayTaskTimePlan">
                           工数の合計に問題ないか。
                         </label>
@@ -104,13 +103,13 @@
                       <hr>
                       <div>[本日の実績]</div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="『実績のタスク』" id="todayTaskCheck">
+                        <input class="form-check-input" type="checkbox" value="「実績のタスク名」" id="todayTaskCheck">
                         <label class="form-check-label" for="todayTaskCheck">
-                          記載タスクに問題はないか。
+                          タスク名に問題はないか。
                         </label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="『実績の合計工数』" id="todayTaskTimeCheck">
+                        <input class="form-check-input" type="checkbox" value="「実績の合計工数」" id="todayTaskTimeCheck">
                         <label class="form-check-label" for="todayTaskTimeCheck">
                           工数の合計に問題ないか。
                         </label>
@@ -118,13 +117,13 @@
                       <hr>
                       <div>[明日の予定]</div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="『明日のタスク』" id="tomorrowTaskCheck">
+                        <input class="form-check-input" type="checkbox" value="「明日のタスク名」" id="tomorrowTaskCheck">
                         <label class="form-check-label" for="tomorrowTaskCheck">
-                          記載タスクに問題はないか。
+                          タスク名に問題はないか。
                         </label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="『明日の合計工数』" id="tomorrowTaskTimeCheck">
+                        <input class="form-check-input" type="checkbox" value="「明日の合計工数」" id="tomorrowTaskTimeCheck">
                         <label class="form-check-label" for="tomorrowTaskTimeCheck">
                           工数の合計に問題ないか。
                         </label>
@@ -146,6 +145,34 @@
     <script>
       const OVERLAY_ID = 'overlay';
       var notyf;
+      // https://carlosroso.com/notyf/
+      function initializeNotyf() {
+          notyf = new Notyf({
+          duration: 5000,
+          position: {
+            x: 'right',
+            y: 'top',
+          },
+          types: [
+            {
+              type: 'warning',
+              background: 'orange',
+              duration: 150000,
+              icon: {
+                className: 'spinner-border text-light'
+                // tagName: 'i'
+              }
+            },
+            {
+              type: 'error',
+              background: 'indianred',
+              duration: 300000,
+              dismissible: true
+            }
+          ]
+         });
+      }
+      window.onload = initializeNotyf();
 
       function toggleOverlayDisplay(isVisible) {
           const overlay = document.getElementById(OVERLAY_ID);
@@ -165,12 +192,10 @@
           toggleOverlayDisplay(false);
           notyf.dismiss(notification);
           notyf.success('<b>完了</b><br/>「日報」を出力します。');
-          // BUTTON_IDS.forEach(id => {
-          //     const btn = document.getElementById(id);
-          //     btn.disabled = false; 
-          // });
-        })
-        .csvCreateReport({taskList});
+        }).withFailureHandler(function(error){ 
+          console.error(error);
+          notyf.error('<b>Error:</b><br/>' + error.message);
+        }).csvCreateReport({taskList});
       }
 
       function createReport(){
@@ -199,35 +224,6 @@
         notyf.dismissAll();
         notyf.success('<b>完了</b><br/>クリップボードに「日報」をコピーしました。');
       }
-
-      // https://www.single-life.tokyo/javascript%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%80%8Enotyf%E3%80%8F%E3%81%A7%E3%80%8C%E3%83%88%E3%83%BC%E3%82%B9%E3%83%88%E9%80%9A%E7%9F%A5%E3%80%8D%EF%BC%88%E9%80%9A%E7%9F%A5%E3%83%90/
-      function initializeNotyf() {
-          notyf = new Notyf({
-          duration: 5000,
-          position: {
-            x: 'right',
-            y: 'top',
-          },
-          types: [
-            {
-              type: 'warning',
-              background: 'orange',
-              duration: 150000,
-              icon: {
-                className: 'spinner-border text-light'
-                // tagName: 'i'
-              }
-            },
-            {
-              type: 'error',
-              background: 'indianred',
-              duration: 300000,
-              dismissible: true
-            }
-          ]
-         });
-      }
-      window.onload = initializeNotyf();
 
       function formCheck(){
         notyf.dismissAll();
