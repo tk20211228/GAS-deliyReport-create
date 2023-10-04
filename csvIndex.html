@@ -24,6 +24,11 @@
         .wrapper {
           display: flex;
         }
+        .small-text {
+            font-size: 12px; /* またはお好みのサイズに設定 */
+        }
+
+
     </style>
   </head>
   <body>
@@ -63,8 +68,8 @@
                 </div>
                 <div class="col-12 mt-2">
                 <div class="wrapper">
-                    <div class="col-6 m-2">
-                      <textarea class="form-control form-control-lg" id="report" style="height:450px"><?= bodyItem.reportBody ?></textarea>
+                    <div class="col-9 m-2">
+                      <textarea class="form-control form-control-sm" id="report" style="height:450px"><?= bodyItem.reportBody ?></textarea>
                     </div>
                     <div class="col-3 m-2">
                       <div>[メール設定]</div>
@@ -166,7 +171,7 @@
             {
               type: 'error',
               background: 'indianred',
-              duration: 300000,
+              duration: 1500,
               dismissible: true
             }
           ]

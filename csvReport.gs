@@ -245,7 +245,7 @@ function csvCreateReport({taskList}){
     output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
     output.taskListString = JSON.stringify(taskList);  // taskListをJSON文字列に変換
     var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
-    .setWidth(1100)
+    .setWidth(890)
     .setHeight(690);
     SpreadsheetApp.getUi().showModelessDialog(html, title);
   }catch(e){
