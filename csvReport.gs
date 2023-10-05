@@ -242,11 +242,11 @@ function csvCreateReport({taskList}){
     let title = bodyItem.subject;
     var output = HtmlService.createTemplateFromFile('csvIndex');
     output.bodyItem = bodyItem;
-    output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
+    output.inputLib = HtmlService.createHtmlOutputFromFile('cdn').getContent();
     output.taskListString = JSON.stringify(taskList);  // taskListをJSON文字列に変換
     var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .setWidth(890)
-    .setHeight(690);
+    .setHeight(660);
     SpreadsheetApp.getUi().showModelessDialog(html, title);
   }catch(e){
     console.log(e)

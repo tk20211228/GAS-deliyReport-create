@@ -24,17 +24,9 @@
         .wrapper {
           display: flex;
         }
-        .small-text {
-            font-size: 12px; /* またはお好みのサイズに設定 */
-        }
-
-
     </style>
   </head>
   <body>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
-
     <!-- Spinnerを追加 -->
     <div id="overlay">
       <div class="d-flex justify-content-center align-items-center" style="height:100%;">
@@ -43,7 +35,6 @@
         </div>
       </div>
     </div>
-
     <div class="form-section m-2">
        <div class="container-fluid">
         <div class="m-2 row d-flex">
@@ -69,7 +60,7 @@
                 <div class="col-12 mt-2">
                 <div class="wrapper">
                     <div class="col-9 m-2">
-                      <textarea class="form-control form-control-sm" id="report" style="height:450px"><?= bodyItem.reportBody ?></textarea>
+                      <textarea class="form-control form-control-sm" id="report" style="height:415px"><?= bodyItem.reportBody ?></textarea>
                     </div>
                     <div class="col-3 m-2">
                       <div>[メール設定]</div>
