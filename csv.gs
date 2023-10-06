@@ -158,7 +158,7 @@ function validateUploadData(mySheet, csvArray, today, mySheetdayListFormattedArr
 function csvInput() {
   let title = 'CSV入力';
   var output = HtmlService.createTemplateFromFile('csvForm');
-  output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
+  output.inputLib = HtmlService.createHtmlOutputFromFile('cdn').getContent();
   var html = output.evaluate()
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .setWidth(750)
