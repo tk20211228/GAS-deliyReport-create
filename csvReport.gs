@@ -1,12 +1,19 @@
 function formatNumberToFixed(value) {
-  if (typeof value === 'number') {
-    if(value == 100) return value;
-    return value.toFixed(1);
-  } else if (value === null || value === undefined) {
-    return "0.00"; // null や undefined の場合に返すデフォルト値
-  }
-  return value; // 文字列などのその他の場合、元の値を返す
+    if (typeof value === 'number') {
+    return (value == 100) ? value : value.toFixed(1);
+  } 
+  return value ?? "0.00";
 }
+
+function formatDate(date) {
+  return date ? Utilities.formatDate(date, "Asia/Tokyo", "yyyy/MM/dd") : 'なし';
+}
+
+//正規表現（/\n/g）を用いて文字列内のすべての改行コード（\n）を検索
+function formatMemo(memo) {
+  return memo ? memo.replace(/\n/g, "\n　") + "\n" : "";
+}
+
 
 function taskBody({activeSheet,taskRow,taskCol}){
 
@@ -32,23 +39,9 @@ function taskBody({activeSheet,taskRow,taskCol}){
 
     const nexstdayAchievementNo = selectNexstColumnNo+todayAchievementNo+1;
 
-    // 日報に必要な日付データをループ処理でフォーマット変換させる。
-    // 開始予定,完了予定
-    let dayDete = [selectAllPlanVlales[1][1],selectAllPlanVlales[1][2]];
-    // console.log(dayDete);
-    // console.log(dayDete.length);
-    for(b=0;b<dayDete.length;++b){
-      if(dayDete[b]){
-        var deta = Utilities.formatDate(dayDete[b], "Asia/Tokyo", "yyyy/MM/dd");
-        dayDete[b] = deta;
-      }else{
-        var deta = 'なし';
-        dayDete[b] = deta;
-      }
-    }
-    const taskName                   = selectAllPlanVlales[1][0];                            // タスク名
-    const startDay                   = dayDete[0];                                           // 開始日
-    const completeDay                = dayDete[1];                                           // 完了日
+    const taskName                   = selectAllPlanVlales[1][0];                                         // タスク名
+    const startDay                   = formatDate(selectAllPlanVlales[1][1]);                             // 開始日
+    const completeDay                = formatDate(selectAllPlanVlales[1][2]);                             // 完了日
     const totalItems                 = formatNumberToFixed(selectAllPlanVlales[1][7]);                    // 消化予定項目数 合計
     const planTotalTime              = formatNumberToFixed(selectAllPlanVlales[2][7]);                    // 工数予定      合計
 
@@ -67,11 +60,7 @@ function taskBody({activeSheet,taskRow,taskCol}){
     const todayActualItemProgress         = formatNumberToFixed(selectAllPlanVlales[10][todayAchievementNo]* 100);//進捗率　(実績)
     const todayPlanUsingTimeProgress      = formatNumberToFixed(selectAllPlanVlales[11][todayAchievementNo]* 100);//工数進捗　(計画)
     const todayActualTimeProgress         = formatNumberToFixed(selectAllPlanVlales[12][todayAchievementNo]* 100);//工数進捗　(実績)
-    if(selectAllPlanVlales[13][todayAchievementNo]){
-      var todayMemo = selectAllPlanVlales[13][todayAchievementNo].replace(/\n/g, "\n　")+ "\n";          // メモ　正規表現（/\n/g）を用いて文字列内のすべての改行コード（\n）を検索
-    }else{
-      var todayMemo = "";          // メモ　正規表現（/\n/g）を用いて文字列内のすべての改行コード（\n）を検索
-    }
+    const todayMemo                       = formatMemo(selectAllPlanVlales[13][todayAchievementNo]);      // メモ
 
     // const tomorrowPlanUsingItem      = Number(selectAllPlanVlales[1][nexstdayAchievementNo]);// 予定項目数  計画(明日)
     // const tomorrowPlanUsingTime      = Number(selectAllPlanVlales[2][nexstdayAchievementNo]);// 予定工数   計画(明日)
@@ -90,11 +79,7 @@ function taskBody({activeSheet,taskRow,taskCol}){
     const tomorrowActualItemProgress       = formatNumberToFixed(selectAllPlanVlales[10][nexstdayAchievementNo]* 100);//予定進捗率(実績)(次日)
     // const tomorrowPlanUsingTimeProgress = selectAllPlanVlales[11][nexstdayAchievementNo];//予定工数進捗(計画)(次日)
     const tomorrowActualUsingTimeProgress  = formatNumberToFixed(selectAllPlanVlales[12][nexstdayAchievementNo]* 100);//予定工数進捗(実績)(次日) 
-    if(selectAllPlanVlales[13][nexstdayAchievementNo]){
-      var tomorrowMemo                     = selectAllPlanVlales[13][nexstdayAchievementNo].replace(/\n/g, "\n　") + "\n";       // メモ
-    }else{
-      var tomorrowMemo  = "";
-    }
+    const tomorrowMemo                     = formatMemo(selectAllPlanVlales[13][nexstdayAchievementNo]);      // メモ
 
     const todayPlan = `
 ・${taskName}
