@@ -162,7 +162,6 @@ ${tomorrowPlanAll}
 よろしくお願い致します。`
 }
 
-
 function csvCreateBody({myName,taskList}){
 
     const activeSheet = SpreadsheetApp.getActiveSheet();
@@ -194,8 +193,6 @@ function csvCreateBody({myName,taskList}){
     });
 
     const taskCol = findDateIndex(formatDateToISO, mySheetdayListFormattedArray) + 1 ;
-    // console.log(formatDateToISO);
-    // console.log(taskCol);
     if (taskCol === -1) {
       throw {
           customError: `「${formatDateToISO}」を、進捗「${myName[0]}」シートの”5:5”から見つけることができませんでした。`,
@@ -207,16 +204,11 @@ function csvCreateBody({myName,taskList}){
         let taskRow = findDateIndex(taskList[i][0], mySheetTaskList);
         if(taskRow === -1) continue;
         let task = taskBody({activeSheet,taskRow,taskCol});
-        // console.log('task',task);
         taskBodyList.push(task);
-        // console.log(taskRow);
     }
-    //  console.log('taskBodyList',taskBodyList)
     const reportBody = createEmailBody({taskBodyList,myName});
-
     const userEmail = Session.getActiveUser().getEmail();
     const destination = getProp('destination-sdm');
-    
     return {reportBody,destination,userEmail,subject};
 }
 
