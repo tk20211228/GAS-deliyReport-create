@@ -3,7 +3,7 @@ function createError(customErrorMessage,systemErrorMessage) {
   var output = HtmlService.createTemplateFromFile('Dailog');
   output.customErrorMessage = customErrorMessage;
   output.systemErrorMessage = systemErrorMessage;
-  output.inputLib = HtmlService.createHtmlOutputFromFile('bootstrap@5.0.2').getContent();
+  output.inputLib = HtmlService.createHtmlOutputFromFile('cdn').getContent();
   var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .setWidth(533)
     .setHeight(300);//16：9の比率に設定
