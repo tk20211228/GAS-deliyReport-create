@@ -1,29 +1,3 @@
-// function checkDay(activeSheet){
-//   //日報出力する日付を取得
-//   const selectValue = activeSheet.getActiveRange().getValue();
-//   const data_judge = isNaN((new Date(selectValue)).getDate());
-//   if(data_judge) {
-//       var day_answer = Browser.msgBox('選択した日付が正しく取得できませんでした。\\n処理を継続しますか？', Browser.Buttons.YES_NO);
-//     }
-//   //日付取得に失敗し処理を継続しない場合
-//   if(day_answer === 'no') {
-//       try{
-//         var day = Utilities.formatDate(selectValue, "Asia/Tokyo", "yyyy/MM/dd");
-//         }catch(day){
-//           const body = '<p>出力したい日付を選択し、実行してください。</p><p>【エラー内容】</p>'+day;
-//           createError(body);
-//         }finally{
-//           return;
-//         }
-//     //処理に成功している場合
-//     }else if(!data_judge){
-//       var day = Utilities.formatDate(selectValue, "Asia/Tokyo", "yyyy/MM/dd");
-//     //日付取得に失敗し、処理を継続する場合
-//     }else{
-//        var day = "yyyy/MM/dd";
-//     }
-//   return day;
-// }
 function getDay(activeSheet) {
   const selectValue = activeSheet.getActiveRange().getValue();
   try {
@@ -31,8 +5,8 @@ function getDay(activeSheet) {
     const date = new Date(selectValue);
     if (isNaN(date.getDate())) throw new Error('Invalid date.');
     return Utilities.formatDate(selectValue, "Asia/Tokyo", "yyyy/MM/dd");
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
     // ユーザーが処理を続行するかどうかを選択
     const userContinues = Browser.msgBox(
       '選択した日付が正しく取得できませんでした。\n処理を継続しますか？',
@@ -41,17 +15,12 @@ function getDay(activeSheet) {
     if (userContinues === 'no') {
       throw {
           customError: `選択した日付が正しく取得できませんでした`,
-          systemError: null
+          systemError: error
       };
     }
     return "yyyy/MM/dd"; // デフォルトの日付フォーマットを返す
   }
 }
-
-
-
-
-//2022/05/18　修正対応
 function createBody(myName){
   const activeSheet = SpreadsheetApp.getActiveSheet();
   //日報出力する日付を取得
