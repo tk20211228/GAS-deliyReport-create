@@ -21,23 +21,27 @@ function getDay(activeSheet) {
     return "yyyy/MM/dd"; // デフォルトの日付フォーマットを返す
   }
 }
+
+ //全作業計画取得
+  function getSelectAllPlanVlales(activeSheet){
+      const activeRange = activeSheet.getActiveRange();
+      const selectRow = activeRange.getRow();
+      return activeSheet.getRange(selectRow,2,14,415).getValues();
+  }
+
 function createBody(myName){
   const activeSheet = SpreadsheetApp.getActiveSheet();
   //日報出力する日付を取得
   let day = getDay(activeSheet);
   if(!day) return;
 
+  const selectAllPlanVlales = getSelectAllPlanVlales(activeSheet);
+
   //題名を作成する。のちほど、メールの件名として扱う
   const subject = '[MDM]【日報】'+ myName[1] + '\ ' + day;
 
-  //進捗表から検索対象の値を取得する。
   const activeRange = activeSheet.getActiveRange();
-  const selectRow = activeRange.getRow();
   const selectColumn = activeRange.getColumn();
-
-  //全作業計画取得
-  const selectAllPlanVlales = activeSheet.getRange(selectRow,2,14,415).getValues();
-
   //本日の作業実績のインデックス値を取得
   const todayAchievementNo = selectColumn - 2;
 
