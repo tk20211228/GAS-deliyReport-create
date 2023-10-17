@@ -22,64 +22,35 @@ function getDay(activeSheet) {
   }
 }
 
- //全作業計画取得
-  function getSelectAllPlanVlales(activeSheet){
-      const activeRange = activeSheet.getActiveRange();
-      const selectRow = activeRange.getRow();
-      return activeSheet.getRange(selectRow,2,14,415).getValues();
-  }
-
-function createBody(myName){
-  const activeSheet = SpreadsheetApp.getActiveSheet();
-  //日報出力する日付を取得
-  let day = getDay(activeSheet);
-  if(!day) return;
-
-  const selectAllPlanVlales = getSelectAllPlanVlales(activeSheet);
-
-  //題名を作成する。のちほど、メールの件名として扱う
-  const subject = '[MDM]【日報】'+ myName[1] + '\ ' + day;
-
-  const activeRange = activeSheet.getActiveRange();
-  const selectColumn = activeRange.getColumn();
-  //本日の作業実績のインデックス値を取得
-  const todayAchievementNo = selectColumn - 2;
-
-  //翌日の作業予定のインデックス値を取得
-  const tasklistNest = [...selectAllPlanVlales[4]];
-  tasklistNest.splice(0,todayAchievementNo+1);
-
-  var selectNexstColumnNo = tasklistNest.findIndex(currentValue => currentValue > 0);
-
-  if(selectNexstColumnNo == -1){
-    const taslListPlanNest = [...selectAllPlanVlales[2]];
-    taslListPlanNest.splice(0,todayAchievementNo+1);
-    console.log(taslListPlanNest);
-     var selectNexstColumnNo = taslListPlanNest.findIndex(currentValue => currentValue > 0);
-  }
-  if(selectNexstColumnNo == -1){
-     var selectNexstColumnNo = 0;
-  }
-
-  const nexstdayAchievementNo = selectNexstColumnNo+todayAchievementNo+1;
-
-  // 日報に必要な日付データをループ処理でフォーマット変換させる。
-  // 開始予定,完了予定
-  let dayDete = [selectAllPlanVlales[1][1],selectAllPlanVlales[1][2]];
-  console.log(dayDete);
-  console.log(dayDete.length);
-  for(b=0;b<dayDete.length;++b){
-    if(dayDete[b]){
-      var deta = Utilities.formatDate(dayDete[b], "Asia/Tokyo", "yyyy-MM-dd");
-      dayDete[b] = deta;
-    }else{
-      var deta = 'なし';
-      dayDete[b] = deta;
+//全作業計画取得
+function getSelectAllPlanVlales(activeSheet){
+    const activeRange = activeSheet.getActiveRange();
+    const selectRow = activeRange.getRow();
+    return activeSheet.getRange(selectRow,2,14,415).getValues();
+}
+function getAchievementNos(selectAllPlanVlales, selectColumn){
+    const todayAchievementNo = selectColumn - 2;
+    const selectNexstColumnNo = getSelectNexstColumnNo(selectAllPlanVlales, todayAchievementNo);
+    const nexstdayAchievementNo = selectNexstColumnNo + todayAchievementNo + 1;
+    return [todayAchievementNo, nexstdayAchievementNo];
+}
+function getSelectNexstColumnNo(selectAllPlanVlales, todayAchievementNo){
+    let selectNexstColumnNo = getNextDayIndex(selectAllPlanVlales[4], todayAchievementNo);
+    if(selectNexstColumnNo === -1){
+        selectNexstColumnNo = getNextDayIndex(selectAllPlanVlales[2], todayAchievementNo);
     }
-  }
-  const destination = getProp('destination-sdm');
-
-  let bodyItem = {
+    return selectNexstColumnNo === -1 ? 0 : selectNexstColumnNo;
+}
+function getNextDayIndex(taskList, todayAchievementNo){
+    const tasklistNest = [...taskList].slice(todayAchievementNo + 1);
+    return tasklistNest.findIndex(currentValue => currentValue > 0);
+}
+function formatDayDate(selectAllPlanVlales){
+    return selectAllPlanVlales[1].slice(1,3).map(date => date ? Utilities.formatDate(date, "Asia/Tokyo", "yyyy-MM-dd") : 'なし');
+}
+function createBodyItem(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo){
+    //... bodyItem object creation logic
+  let bodyItemObject = {
     destination                :[destination,'宛先'],
     subject                    :[subject,'件名'],
     familyName                 :[myName[0],'担当者'],//
@@ -116,6 +87,43 @@ function createBody(myName){
     tomorrowTotalPlanUsingTime :[Number(selectAllPlanVlales[7][nexstdayAchievementNo]),'累積時間'],// 計画(明日)
     tomorrowMemo               :[selectAllPlanVlales[13][nexstdayAchievementNo],'メモ'],// 
     };
+    return bodyItemObject;
+}
+function createAddBody(bodyItem){
+    let addBody = '';
+    for(let key in bodyItem) {
+        addBody += createBodyEntry(key, bodyItem[key]);
+    }
+    return addBody;
+}
+function createBodyEntry(key, item){
+    const [value, label] = item;
+    //... HTML template logic
+    // HTMLテンプレートロジックをここに配置します。
+    // 返される文字列は`addBody`に追加されます。
+}
+
+function createBody(myName){
+  const activeSheet = SpreadsheetApp.getActiveSheet();
+  //日報出力する日付を取得
+  let day = getDay(activeSheet);
+  if(!day) return;
+
+  const selectAllPlanVlales = getSelectAllPlanVlales(activeSheet);
+  const selectColumn = activeSheet.getActiveRange().getColumn();
+  //本日の作業実績のインデックス値,翌日の作業計画のインデックス値を取得
+  const [todayAchievementNo, nexstdayAchievementNo] = getAchievementNos(selectAllPlanVlales, selectColumn);
+  //題名を作成する。のちほど、メールの件名として扱う
+  const subject = '[MDM]【日報】'+ myName[1] + '\ ' + day;
+  // 日報に必要な日付データをループ処理でフォーマット変換させる。
+  // 開始予定,完了予定
+  const dayDete = formatDayDate(selectAllPlanVlales);
+
+  const destination = getProp('destination-sdm');
+
+  let bodyItem = createBodyItem(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo);
+
+  // bodyItem['addBody'] = createAddBody(bodyItem);
 
   var addBody = '';
   for( key in bodyItem ) {
