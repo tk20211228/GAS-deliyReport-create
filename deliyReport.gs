@@ -48,7 +48,7 @@ function getNextDayIndex(taskList, todayAchievementNo){
 function formatDayDate(selectAllPlanVlales){
     return selectAllPlanVlales[1].slice(1,3).map(date => date ? Utilities.formatDate(date, "Asia/Tokyo", "yyyy-MM-dd") : 'なし');
 }
-function createBodyItem(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo){
+function createBodyItemObject(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo){
     //... bodyItem object creation logic
   let bodyItemObject = {
     destination                :[destination,'宛先'],
@@ -89,18 +89,37 @@ function createBodyItem(selectAllPlanVlales, dayDete, destination, subject, myNa
     };
     return bodyItemObject;
 }
-function createAddBody(bodyItem){
+function createAddBody(bodyItemObject){
     let addBody = '';
-    for(let key in bodyItem) {
-        addBody += createBodyEntry(key, bodyItem[key]);
+    for(let key in bodyItemObject) {
+      if(bodyItem[key][1] === 'メモ') continue;
+      addBody += createBodyEntry(key, bodyItemObject[key]);
     }
     return addBody;
 }
-function createBodyEntry(key, item){
-    const [value, label] = item;
-    //... HTML template logic
-    // HTMLテンプレートロジックをここに配置します。
-    // 返される文字列は`addBody`に追加されます。
+function createBodyEntry(key, objectItem){
+    if(objectItem[key][1] === '開始日'||objectItem[key][1] === '完了日'){
+      let body = `<label for="${key}" class="col-sm-2 col-form-label">${objectItem[key][1]}</label><div class="col-sm-4 mb-2"><input type="date" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]"></div>`;
+      addBody += body;
+    }else if(bodyItem[key][1] === '宛先'||bodyItem[key][1] === '件名'||bodyItem[key][1] === '担当者'||bodyItem[key][1] === 'タスク名'){
+      let body = `<label for="${key}" class="col-sm-2 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-10 mb-2"><input type="text" class="form-control" id="${key}" v-model="bodyItem.${key}[0]"></div>`;
+      addBody += body;
+    }else if(bodyItem[key][1] === ' 本日の作業実績 [ 実績 ] / [ 目標 ] '|| bodyItem[key][1] === ' 明日の作業予定 [ 実績 ] / [ 目標 ] '){
+      let body = `<div class="d-flex justify-content-center mb-2">-----------------${bodyItem[key][1]}-----------------</div>`;
+      addBody += body;
+    }
+    else if(bodyItem[key][1] === '累積項目数'||bodyItem[key][1] === '累積時間'){
+      let body = `<label for="${key}" class="col-sm-3 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]" :value="${key}" min="0"></div>`;
+      addBody += body;
+    }
+    else{
+      let body = `<label for="${key}" class="col-sm-3 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]" min="0"></div>`;
+      addBody += body;
+      };
+
+    return body;
+
+
 }
 
 function createBody(myName){
@@ -121,9 +140,9 @@ function createBody(myName){
 
   const destination = getProp('destination-sdm');
 
-  let bodyItem = createBodyItem(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo);
-
-  // bodyItem['addBody'] = createAddBody(bodyItem);
+  let bodyItem = createBodyItemObject(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo);
+  // let bodyItemObject = createBodyItemObject(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo);
+  // bodyItem['addBody'] = createAddBody(bodyItemObject);
 
   var addBody = '';
   for( key in bodyItem ) {
