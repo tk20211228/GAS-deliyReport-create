@@ -51,6 +51,7 @@
       const myApp = {
         setup() {
           const bodyItem = Vue.reactive(<?!= bodyItemJSON ?>);
+          // const arrayItem = Vue.reactive(<?!= bodyItemJSON ?>);
 
           //消化項目と累積項目数を連動(本日)
           let todayActualItemConst = bodyItem.todayActualItem[0];

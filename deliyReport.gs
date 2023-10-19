@@ -92,33 +92,32 @@ function createBodyItemObject(selectAllPlanVlales, dayDete, destination, subject
 function createAddBody(bodyItemObject){
     let addBody = '';
     for(let key in bodyItemObject) {
-      if(bodyItem[key][1] === 'メモ') continue;
+      if(bodyItemObject[key][1] === 'メモ') continue;
       addBody += createBodyEntry(key, bodyItemObject[key]);
     }
     return addBody;
 }
-function createBodyEntry(key, objectItem){
-    if(objectItem[key][1] === '開始日'||objectItem[key][1] === '完了日'){
-      let body = `<label for="${key}" class="col-sm-2 col-form-label">${objectItem[key][1]}</label><div class="col-sm-4 mb-2"><input type="date" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]"></div>`;
-      addBody += body;
-    }else if(bodyItem[key][1] === '宛先'||bodyItem[key][1] === '件名'||bodyItem[key][1] === '担当者'||bodyItem[key][1] === 'タスク名'){
-      let body = `<label for="${key}" class="col-sm-2 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-10 mb-2"><input type="text" class="form-control" id="${key}" v-model="bodyItem.${key}[0]"></div>`;
-      addBody += body;
-    }else if(bodyItem[key][1] === ' 本日の作業実績 [ 実績 ] / [ 目標 ] '|| bodyItem[key][1] === ' 明日の作業予定 [ 実績 ] / [ 目標 ] '){
-      let body = `<div class="d-flex justify-content-center mb-2">-----------------${bodyItem[key][1]}-----------------</div>`;
-      addBody += body;
+function createBodyEntry(key, arrayItem){
+  let body;
+    if(arrayItem[1] === '開始日'||arrayItem[1] === '完了日'){
+      body = `<label for="${key}" class="col-sm-2 col-form-label">${arrayItem[1]}</label><div class="col-sm-4 mb-2"><input type="date" class="form-control text-end" id="${key}" v-model="arrayItem.${key}[0]"></div>`;
+
+    }else if(arrayItem[1] === '宛先'||arrayItem[1] === '件名'||arrayItem[1] === '担当者'||arrayItem[1] === 'タスク名'){
+      body = `<label for="${key}" class="col-sm-2 col-form-label">${arrayItem[1]}</label><div class="col-sm-10 mb-2"><input type="text" class="form-control" id="${key}" v-model="arrayItem.${key}[0]"></div>`;
+
+    }else if(arrayItem[1] === ' 本日の作業実績 [ 実績 ] / [ 目標 ] '|| arrayItem[1] === ' 明日の作業予定 [ 実績 ] / [ 目標 ] '){
+      body = `<div class="d-flex justify-content-center mb-2">-----------------${arrayItem[1]}-----------------</div>`;
+
     }
-    else if(bodyItem[key][1] === '累積項目数'||bodyItem[key][1] === '累積時間'){
-      let body = `<label for="${key}" class="col-sm-3 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]" :value="${key}" min="0"></div>`;
-      addBody += body;
+    else if(arrayItem[1] === '累積項目数'||arrayItem[1] === '累積時間'){
+      body = `<label for="${key}" class="col-sm-3 col-form-label">${arrayItem[1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="arrayItem.${key}[0]" :value="${key}" min="0"></div>`;
+
     }
     else{
-      let body = `<label for="${key}" class="col-sm-3 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]" min="0"></div>`;
-      addBody += body;
+      body = `<label for="${key}" class="col-sm-3 col-form-label">${arrayItem[1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="arrayItem.${key}[0]" min="0"></div>`;
+
       };
-
     return body;
-
 
 }
 
@@ -140,10 +139,11 @@ function createBody(myName){
 
   const destination = getProp('destination-sdm');
 
-  let bodyItem = createBodyItemObject(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo);
   // let bodyItemObject = createBodyItemObject(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo);
-  // bodyItem['addBody'] = createAddBody(bodyItemObject);
+  // bodyItemObject['addBody'] = createAddBody(bodyItemObject);
+  // return bodyItemObject;
 
+  let bodyItem = createBodyItemObject(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo);
   var addBody = '';
   for( key in bodyItem ) {
     if(bodyItem[key][1] === 'メモ') continue;
@@ -175,7 +175,7 @@ function createReport(){
   try{
       const myName = getMyname(); // Errorがあるとnot mypropが返る
       var bodyItem = createBody(myName);
-      // console.log(bodyItem);
+      console.log(bodyItem);
       if(!bodyItem) return;
 
       let title = bodyItem.subject[0];
