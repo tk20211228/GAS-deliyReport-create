@@ -202,3 +202,61 @@ function createReport(){
     }
 
 };
+
+function createReportRenew(){
+  ///メールの内容を作成
+  try{
+      const myName = getMyname(); // Errorがあるとnot mypropが返る
+      var bodyItem = createBodyRenew(myName);
+      console.log(bodyItem);
+      if(!bodyItem) return;
+
+      let title = bodyItem.subject[0];
+      var output = HtmlService.createTemplateFromFile('index-new');
+      output.bodyItemJSON = JSON.stringify(bodyItem);
+      output.bodyItem = bodyItem;
+      output.inputsub = title;
+      output.inputCss = HtmlService.createHtmlOutputFromFile('css').getContent();
+      output.inputJs = HtmlService.createHtmlOutputFromFile('js').getContent();
+
+      var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .setWidth(1100)
+      .setHeight(790);
+      SpreadsheetApp.getUi().showModelessDialog(html, title);
+    }catch(e){
+      if(e.systemError === "not myprop"){
+        Browser.msgBox('ユーザー名が設定されていません。\\nプロパティ設定で設定後、再度実行してください。', Browser.Buttons.YES);
+        inputMyprop();
+        return;
+      };
+      const customErrorMessage = e.customError || '';
+      const systemErrorMessage = e.systemError || e.message || '';
+      createError(customErrorMessage, systemErrorMessage);
+    }
+
+};
+
+
+function createBodyRenew(myName){
+  const activeSheet = SpreadsheetApp.getActiveSheet();
+  //日報出力する日付を取得
+  let day = getDay(activeSheet);
+  if(!day) return;
+
+  const selectAllPlanVlales = getSelectAllPlanVlales(activeSheet);
+  const selectColumn = activeSheet.getActiveRange().getColumn();
+  //本日の作業実績のインデックス値,翌日の作業計画のインデックス値を取得
+  const [todayAchievementNo, nexstdayAchievementNo] = getAchievementNos(selectAllPlanVlales, selectColumn);
+  //題名を作成する。のちほど、メールの件名として扱う
+  const subject = '[MDM]【日報】'+ myName[1] + '\ ' + day;
+  // 日報に必要な日付データをループ処理でフォーマット変換させる。
+  // 開始予定,完了予定
+  const dayDete = formatDayDate(selectAllPlanVlales);
+
+  const destination = getProp('destination-sdm');
+
+  let bodyItemObject = createBodyItemObject(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo);
+  bodyItemObject['addBody'] = createAddBody(bodyItemObject);
+  return bodyItemObject;
+
+}

@@ -3,6 +3,7 @@ function onOpen(){
       meinUI
         .createMenu('日報')
            .addItem('日報作成', 'createReport')
+           .addItem('日報作成-renew', 'createReportRenew')
           //  .addItem('日報作成-新フォーマット※作成中', 'newCreateReport')
           //  .addItem('開始日報作成','b')
         .addToUi();
