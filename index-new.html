@@ -26,10 +26,10 @@
             <div class="col-6 m-2">
               <label for="report" class="form-label"></label>
               <textarea class="form-control form-control-lg" id="report" name="report123" :value='displayValue'></textarea>
-              <!-- <button id="send_button" type="button" class="btn btn-outline-primary m-2" @click="createGmail">  -->
+              <!-- <button id="send_button" type="button" class="btn btn-outline-primary m-2" @click="createGmail"> 
                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" v-show="deta.show"></span>
                 {{ deta.show ? 'Loading...' : 'Gmailの下書きに出力する'}}
-                </button>
+                </button> -->
               <button type="button" class="btn btn-outline-success m-2" v-on:click="copy">テキストを全てコピーする</button>
               <button type="button" class="btn btn-outline-secondary m-2" onclick="google.script.host.close()">閉じる</button>
               <!-- <button type="button" class="btn btn-outline-secondary btn-lg m-3" onclick="google.script.run.withSuccessHandler(function(){
@@ -298,7 +298,7 @@ ${tomorrowPlanBody}
 
             displayValue,
             copy,
-            createGmail,
+            // createGmail,
             deta,
             }
 
