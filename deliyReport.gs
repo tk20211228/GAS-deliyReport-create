@@ -207,14 +207,14 @@ function createReportRenew(){
   ///メールの内容を作成
   try{
       const myName = getMyname(); // Errorがあるとnot mypropが返る
-      var bodyItem = createBodyRenew(myName);
-      console.log(bodyItem);
-      if(!bodyItem) return;
+      var bodyItemObject = createBodyRenew(myName);
+      console.log(bodyItemObject);
+      if(!bodyItemObject) return;
 
       let title = bodyItem.subject[0];
       var output = HtmlService.createTemplateFromFile('index-new');
-      output.bodyItemJSON = JSON.stringify(bodyItem);
-      output.bodyItem = bodyItem;
+      output.bodyItemJSON = JSON.stringify(bodyItemObject);
+      output.bodyItemObject = bodyItemObject;
       output.inputsub = title;
       output.inputCss = HtmlService.createHtmlOutputFromFile('css').getContent();
       output.inputJs = HtmlService.createHtmlOutputFromFile('js').getContent();
