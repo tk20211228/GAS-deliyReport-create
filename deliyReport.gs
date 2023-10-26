@@ -18,7 +18,7 @@ function getDay(activeSheet) {
           systemError: error
       };
     }
-    return "yyyy/MM/dd"; // デフォルトの日付フォーマットを返す
+    return "yyyy/MM/dd"; // 日付フォーマットを返す
   }
 }
 
