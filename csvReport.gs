@@ -163,7 +163,6 @@ ${tomorrowPlanAll}
 }
 
 function csvCreateBody({myName,taskList}){
-
     const activeSheet = SpreadsheetApp.getActiveSheet();
     const sheetName = activeSheet.getSheetName();
     if(sheetName !== myName[0]){
