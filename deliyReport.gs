@@ -100,21 +100,21 @@ function createAddBody(bodyItemObject){
 function createBodyEntry(key, arrayItem){
   let body;
     if(arrayItem[1] === '開始日'||arrayItem[1] === '完了日'){
-      body = `<label for="${key}" class="col-sm-2 col-form-label">${arrayItem[1]}</label><div class="col-sm-4 mb-2"><input type="date" class="form-control text-end" id="${key}" v-model="arrayItem.${key}[0]"></div>`;
+      body = `<label for="${key}" class="col-sm-2 col-form-label">${arrayItem[1]}</label><div class="col-sm-4 mb-2"><input type="date" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]"></div>`;
 
     }else if(arrayItem[1] === '宛先'||arrayItem[1] === '件名'||arrayItem[1] === '担当者'||arrayItem[1] === 'タスク名'){
-      body = `<label for="${key}" class="col-sm-2 col-form-label">${arrayItem[1]}</label><div class="col-sm-10 mb-2"><input type="text" class="form-control" id="${key}" v-model="arrayItem.${key}[0]"></div>`;
+      body = `<label for="${key}" class="col-sm-2 col-form-label">${arrayItem[1]}</label><div class="col-sm-10 mb-2"><input type="text" class="form-control" id="${key}" v-model="bodyItem.${key}[0]"></div>`;
 
     }else if(arrayItem[1] === ' 本日の作業実績 [ 実績 ] / [ 目標 ] '|| arrayItem[1] === ' 明日の作業予定 [ 実績 ] / [ 目標 ] '){
       body = `<div class="d-flex justify-content-center mb-2">-----------------${arrayItem[1]}-----------------</div>`;
 
     }
     else if(arrayItem[1] === '累積項目数'||arrayItem[1] === '累積時間'){
-      body = `<label for="${key}" class="col-sm-3 col-form-label">${arrayItem[1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="arrayItem.${key}[0]" :value="${key}" min="0"></div>`;
+      body = `<label for="${key}" class="col-sm-3 col-form-label">${arrayItem[1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]" :value="${key}" min="0"></div>`;
 
     }
     else{
-      body = `<label for="${key}" class="col-sm-3 col-form-label">${arrayItem[1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="arrayItem.${key}[0]" min="0"></div>`;
+      body = `<label for="${key}" class="col-sm-3 col-form-label">${arrayItem[1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]" min="0"></div>`;
 
       };
     return body;
@@ -207,14 +207,13 @@ function createReportRenew(){
   ///メールの内容を作成
   try{
       const myName = getMyname(); // Errorがあるとnot mypropが返る
-      var bodyItemObject = createBodyRenew(myName);
-      console.log(bodyItemObject);
-      if(!bodyItemObject) return;
+      var bodyItem = createBodyRenew(myName);
+      if(!bodyItem) return;
 
       let title = bodyItem.subject[0];
       var output = HtmlService.createTemplateFromFile('index-new');
-      output.bodyItemJSON = JSON.stringify(bodyItemObject);
-      output.bodyItemObject = bodyItemObject;
+      output.bodyItemJSON = JSON.stringify(bodyItem);
+      output.bodyItem = bodyItem;
       output.inputsub = title;
       output.inputCss = HtmlService.createHtmlOutputFromFile('css').getContent();
       output.inputJs = HtmlService.createHtmlOutputFromFile('js').getContent();
