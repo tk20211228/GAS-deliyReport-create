@@ -1,14 +1,4 @@
 function myName() {
-// let user = Session.getActiveUser(); // スクリプトの実行者を取得
-// let contact = ContactsApp.getContact(user); // 実行者の連絡帳データを取得
-
-// let fullName = contact.getFullName(); // フルネームを取得
-// let familyName = contact.getFamilyName(); // 姓（苗字）のみ
-// let givenName = contact.getGivenName(); // 名（下の名前）のみ
-// console.log(fullName);
-// console.log(familyName);
-// console.log(givenName);
-// let mailAddress = user.getUserLoginId();
 try{
   const myData = getMyname();
   // console.log("myData");

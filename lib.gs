@@ -59,14 +59,6 @@ function getProp(value){
   }catch{
   }
 }
-function getPropTEST(){
-  // 取得したメールアドレスでプロパティから名前を取得
-  try{
-    var scriptProperties = PropertiesService.getScriptProperties();
-    var propData = scriptProperties.getProperties();
-  }catch{
-  }
-}
 
 //プロパティに苗字を登録
 function setProp(key,value) {
