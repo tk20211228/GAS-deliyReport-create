@@ -121,87 +121,87 @@ function createBodyEntry(key, arrayItem){
 
 }
 
-function createBody(myName){
-  const activeSheet = SpreadsheetApp.getActiveSheet();
-  //日報出力する日付を取得
-  let day = getDay(activeSheet);
-  if(!day) return;
+// function createBody(myName){
+//   const activeSheet = SpreadsheetApp.getActiveSheet();
+//   //日報出力する日付を取得
+//   let day = getDay(activeSheet);
+//   if(!day) return;
 
-  const selectAllPlanVlales = getSelectAllPlanVlales(activeSheet);
-  const selectColumn = activeSheet.getActiveRange().getColumn();
-  //本日の作業実績のインデックス値,翌日の作業計画のインデックス値を取得
-  const [todayAchievementNo, nexstdayAchievementNo] = getAchievementNos(selectAllPlanVlales, selectColumn);
-  //題名を作成する。のちほど、メールの件名として扱う
-  const subject = '[MDM]【日報】'+ myName[1] + '\ ' + day;
-  // 日報に必要な日付データをループ処理でフォーマット変換させる。
-  // 開始予定,完了予定
-  const dayDete = formatDayDate(selectAllPlanVlales);
+//   const selectAllPlanVlales = getSelectAllPlanVlales(activeSheet);
+//   const selectColumn = activeSheet.getActiveRange().getColumn();
+//   //本日の作業実績のインデックス値,翌日の作業計画のインデックス値を取得
+//   const [todayAchievementNo, nexstdayAchievementNo] = getAchievementNos(selectAllPlanVlales, selectColumn);
+//   //題名を作成する。のちほど、メールの件名として扱う
+//   const subject = '[MDM]【日報】'+ myName[1] + '\ ' + day;
+//   // 日報に必要な日付データをループ処理でフォーマット変換させる。
+//   // 開始予定,完了予定
+//   const dayDete = formatDayDate(selectAllPlanVlales);
 
-  const destination = getProp('destination-sdm');
+//   const destination = getProp('destination-sdm');
 
-  // let bodyItemObject = createBodyItemObject(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo);
-  // bodyItemObject['addBody'] = createAddBody(bodyItemObject);
-  // return bodyItemObject;
+//   // let bodyItemObject = createBodyItemObject(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo);
+//   // bodyItemObject['addBody'] = createAddBody(bodyItemObject);
+//   // return bodyItemObject;
 
-  let bodyItem = createBodyItemObject(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo);
-  var addBody = '';
-  for( key in bodyItem ) {
-    if(bodyItem[key][1] === 'メモ') continue;
-    if(bodyItem[key][1] === '開始日'||bodyItem[key][1] === '完了日'){
-      let body = `<label for="${key}" class="col-sm-2 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-4 mb-2"><input type="date" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]"></div>`;
-      addBody += body;
-    }else if(bodyItem[key][1] === '宛先'||bodyItem[key][1] === '件名'||bodyItem[key][1] === '担当者'||bodyItem[key][1] === 'タスク名'){
-      let body = `<label for="${key}" class="col-sm-2 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-10 mb-2"><input type="text" class="form-control" id="${key}" v-model="bodyItem.${key}[0]"></div>`;
-      addBody += body;
-    }else if(bodyItem[key][1] === ' 本日の作業実績 [ 実績 ] / [ 目標 ] '|| bodyItem[key][1] === ' 明日の作業予定 [ 実績 ] / [ 目標 ] '){
-      let body = `<div class="d-flex justify-content-center mb-2">-----------------${bodyItem[key][1]}-----------------</div>`;
-      addBody += body;
-    }
-    else if(bodyItem[key][1] === '累積項目数'||bodyItem[key][1] === '累積時間'){
-      let body = `<label for="${key}" class="col-sm-3 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]" :value="${key}" min="0"></div>`;
-      addBody += body;
-    }
-    else{
-      let body = `<label for="${key}" class="col-sm-3 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]" min="0"></div>`;
-      addBody += body;
-      };
-    };
-  bodyItem['addBody'] = addBody;
-  return bodyItem;
-}
+//   let bodyItem = createBodyItemObject(selectAllPlanVlales, dayDete, destination, subject, myName, todayAchievementNo, nexstdayAchievementNo);
+//   var addBody = '';
+//   for( key in bodyItem ) {
+//     if(bodyItem[key][1] === 'メモ') continue;
+//     if(bodyItem[key][1] === '開始日'||bodyItem[key][1] === '完了日'){
+//       let body = `<label for="${key}" class="col-sm-2 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-4 mb-2"><input type="date" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]"></div>`;
+//       addBody += body;
+//     }else if(bodyItem[key][1] === '宛先'||bodyItem[key][1] === '件名'||bodyItem[key][1] === '担当者'||bodyItem[key][1] === 'タスク名'){
+//       let body = `<label for="${key}" class="col-sm-2 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-10 mb-2"><input type="text" class="form-control" id="${key}" v-model="bodyItem.${key}[0]"></div>`;
+//       addBody += body;
+//     }else if(bodyItem[key][1] === ' 本日の作業実績 [ 実績 ] / [ 目標 ] '|| bodyItem[key][1] === ' 明日の作業予定 [ 実績 ] / [ 目標 ] '){
+//       let body = `<div class="d-flex justify-content-center mb-2">-----------------${bodyItem[key][1]}-----------------</div>`;
+//       addBody += body;
+//     }
+//     else if(bodyItem[key][1] === '累積項目数'||bodyItem[key][1] === '累積時間'){
+//       let body = `<label for="${key}" class="col-sm-3 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]" :value="${key}" min="0"></div>`;
+//       addBody += body;
+//     }
+//     else{
+//       let body = `<label for="${key}" class="col-sm-3 col-form-label">${bodyItem[key][1]}</label><div class="col-sm-3 mb-2"><input type="number" class="form-control text-end" id="${key}" v-model="bodyItem.${key}[0]" min="0"></div>`;
+//       addBody += body;
+//       };
+//     };
+//   bodyItem['addBody'] = addBody;
+//   return bodyItem;
+// }
 
-function createReport(){
-  ///メールの内容を作成
-  try{
-      const myName = getMyname(); // Errorがあるとnot mypropが返る
-      var bodyItem = createBody(myName);
-      console.log(bodyItem);
-      if(!bodyItem) return;
+// function createReport(){
+//   ///メールの内容を作成
+//   try{
+//       const myName = getMyname(); // Errorがあるとnot mypropが返る
+//       var bodyItem = createBody(myName);
+//       console.log(bodyItem);
+//       if(!bodyItem) return;
 
-      let title = bodyItem.subject[0];
-      var output = HtmlService.createTemplateFromFile('index');
-      output.bodyItemJSON = JSON.stringify(bodyItem);
-      output.bodyItem = bodyItem;
-      output.inputsub = title;
-      output.inputCss = HtmlService.createHtmlOutputFromFile('css').getContent();
-      output.inputJs = HtmlService.createHtmlOutputFromFile('js').getContent();
+//       let title = bodyItem.subject[0];
+//       var output = HtmlService.createTemplateFromFile('index');
+//       output.bodyItemJSON = JSON.stringify(bodyItem);
+//       output.bodyItem = bodyItem;
+//       output.inputsub = title;
+//       output.inputCss = HtmlService.createHtmlOutputFromFile('css').getContent();
+//       output.inputJs = HtmlService.createHtmlOutputFromFile('js').getContent();
 
-      var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
-      .setWidth(1100)
-      .setHeight(790);
-      SpreadsheetApp.getUi().showModelessDialog(html, title);
-    }catch(e){
-      if(e.systemError === "not myprop"){
-        Browser.msgBox('ユーザー名が設定されていません。\\nプロパティ設定で設定後、再度実行してください。', Browser.Buttons.YES);
-        inputMyprop();
-        return;
-      };
-      const customErrorMessage = e.customError || '';
-      const systemErrorMessage = e.systemError || e.message || '';
-      createError(customErrorMessage, systemErrorMessage);
-    }
+//       var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
+//       .setWidth(1100)
+//       .setHeight(790);
+//       SpreadsheetApp.getUi().showModelessDialog(html, title);
+//     }catch(e){
+//       if(e.systemError === "not myprop"){
+//         Browser.msgBox('ユーザー名が設定されていません。\\nプロパティ設定で設定後、再度実行してください。', Browser.Buttons.YES);
+//         inputMyprop();
+//         return;
+//       };
+//       const customErrorMessage = e.customError || '';
+//       const systemErrorMessage = e.systemError || e.message || '';
+//       createError(customErrorMessage, systemErrorMessage);
+//     }
 
-};
+// };
 
 function createReportRenew(){
   ///メールの内容を作成

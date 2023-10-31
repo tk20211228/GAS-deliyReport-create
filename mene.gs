@@ -2,15 +2,11 @@ function onOpen(){
     var meinUI = SpreadsheetApp.getUi();
       meinUI
         .createMenu('日報')
-           .addItem('日報作成', 'createReport')
+          //  .addItem('日報作成', 'createReport')
            .addItem('日報作成-renew', 'createReportRenew')
-          //  .addItem('日報作成-新フォーマット※作成中', 'newCreateReport')
-          //  .addItem('開始日報作成','b')
         .addToUi();
       meinUI
         .createMenu('進捗入力')
-        // .addItem('「進捗入力（空）を作成」', 'c')//マクロ.gsで管理
-        // .addItem('全体把握から進捗入力を作成', 'inputPlanCells')//lib.gsで管理
         .addItem('全体把握から進捗を作成', 'inputPlanCellsNexst')//lib.gsで管理
         .addToUi();
       meinUI
