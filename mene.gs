@@ -3,7 +3,7 @@ function onOpen(){
       meinUI
         .createMenu('日報')
           //  .addItem('日報作成', 'createReport')
-           .addItem('日報作成-renew', 'createReportRenew')
+           .addItem('日報作成', 'createReportRenew')
         .addToUi();
       meinUI
         .createMenu('進捗入力')
