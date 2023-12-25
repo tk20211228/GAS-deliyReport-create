@@ -18,19 +18,24 @@ function formatMemo(memo) {
 function taskBody({activeSheet,taskRow,taskCol}){
 
     //全作業計画取得
-    let selectAllPlanVlales = activeSheet.getRange(taskRow,2,14,415).getValues();
+    let selectAllPlanVlales = activeSheet.getRange(taskRow,2,14,425).getValues();
     //本日の作業実績のインデックス値を取得
-    let todayAchievementNo = taskCol - 2;
+    let todayAchievementNo = taskCol;//マジックナンバーの”-2”を削除
+    // console.log("taskRow",taskRow);
+    // console.log("taskCol",taskCol);
+    // console.log("todayAchievementNo",todayAchievementNo);
     //翌日の作業予定のインデックス値を取得
     const tasklistNest = [...selectAllPlanVlales[4]];
+    // console.log("selectAllPlanVlales",selectAllPlanVlales);
+    // console.log("tasklistNest",tasklistNest);
     tasklistNest.splice(0,todayAchievementNo+1);
-
     var selectNexstColumnNo = tasklistNest.findIndex(currentValue => currentValue > 0);
+    // console.log("selectNexstColumnNo",selectNexstColumnNo);
 
     if(selectNexstColumnNo == -1){
       const taslListPlanNest = [...selectAllPlanVlales[2]];
       taslListPlanNest.splice(0,todayAchievementNo+1);
-      // console.log(taslListPlanNest);
+      // console.log("taslListPlanNest",taslListPlanNest);
       var selectNexstColumnNo = taslListPlanNest.findIndex(currentValue => currentValue > 0);
     }
     if(selectNexstColumnNo == -1){
@@ -177,6 +182,7 @@ function csvCreateBody({myName,taskList}){
     const today = new Date()
     const formatDateToSlash = Utilities.formatDate(today, "Asia/Tokyo", "yyyy/MM/dd");
     const formatDateToISO = Utilities.formatDate(today, "Asia/Tokyo", "yyyy-MM-dd");
+    console.log(formatDateToISO)
 
     //題名を作成する。のちほど、メールの件名として扱う
     const subject = '[MDM]【日報】'+ myName[1] + '\ ' + formatDateToSlash;
@@ -191,7 +197,7 @@ function csvCreateBody({myName,taskList}){
         return item;
     });
 
-    const taskCol = findDateIndex(formatDateToISO, mySheetdayListFormattedArray) + 1 ;
+    const taskCol = findDateIndex(formatDateToISO, mySheetdayListFormattedArray) - 1 ; //ここの”-1”は配列からスプレットシートの列を特定するため、代入している
     if (taskCol === -1) {
       throw {
           customError: `「${formatDateToISO}」を、進捗「${myName[0]}」シートの”5:5”から見つけることができませんでした。`,
@@ -220,6 +226,7 @@ function csvCreateReport({taskList}){
     output.bodyItem = bodyItem;
     output.inputLib = HtmlService.createHtmlOutputFromFile('cdn').getContent();
     output.taskListString = JSON.stringify(taskList);  // taskListをJSON文字列に変換
+    // console.log("taskList",taskList)
     var html = output.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .setWidth(890)
     .setHeight(660);
