@@ -14,7 +14,6 @@ function formatMemo(memo) {
   return memo ? memo.replace(/\n/g, "\n　") + "\n" : "";
 }
 
-
 function taskBody({activeSheet,taskRow,taskCol}){
 
     //全作業計画取得
@@ -208,7 +207,13 @@ function csvCreateBody({myName,taskList}){
     for(i=0;i<taskList.length;i++){
         let taskRow = findDateIndex(taskList[i][0], mySheetTaskList);
         if(taskRow === -1) continue;
-        let task = taskBody({activeSheet,taskRow,taskCol});
+        // 正規表現で検出
+          const pattern = /(_朝会_|_機器管理_|_その他_|_CS_)/;
+          if (pattern.test(taskList[i][0])) {
+            var task = taskBodyOpsion({activeSheet,taskRow,taskCol});
+          } else {
+            var task = taskBody({activeSheet,taskRow,taskCol});
+          }        
         taskBodyList.push(task);
     }
     const reportBody = createEmailBody({taskBodyList,myName});
