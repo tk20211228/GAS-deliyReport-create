@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <base target="_top">
+    <?!= inputCss ?>
+
+  </head>
+  <body>
+
+    <div id="overlay">
+      <div class="cv-copy">
+        <h1>実行中…</h1>
+        <h3>※ダイヤログは閉じないで下さい。</h3>
+        <div class="spinner-border text-light" style="width: 6rem; height: 6rem;" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-2" id="app">
+       <div class="container-fluid">
+        <div class="m-2 row">
+          <form autocomplete="off">
+          <div class="wrapper">
+            <div class="col-6 m-2">
+              <label for="report" class="form-label"></label>
+              <textarea class="form-control form-control-lg" id="report" name="report123" :value='displayValue'></textarea>
+              <button id="send_button" type="button" class="btn btn-outline-primary m-2" @click="createGmail"> 
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" v-show="deta.show"></span>
+                {{ deta.show ? 'Loading...' : 'Gmailの下書きに出力する'}}
+                </button>
+              <button type="button" class="btn btn-outline-success m-2" v-on:click="copy">テキストを全てコピーする</button>
+              <button type="button" class="btn btn-outline-secondary m-2" onclick="google.script.host.close()">閉じる</button>
+              <!-- <button type="button" class="btn btn-outline-secondary btn-lg m-3" onclick="google.script.run.withSuccessHandler(function(){
+                  google.script.host.close();
+              }).newCreateReportVer_1()">再実行</button> -->
+            </div>
+            <div class="col-6 m-2">
+              <div class="m-2 row">
+                <?!= bodyItem['addBody'] ?>
+              </div>
+            </div>
+          </div>
+          </form>
+       </div>
+     </div>
+    </div>
+    <?!= inputJs ?>
+    <script>
+      const myApp = {
+        setup() {
+          const bodyItem = Vue.reactive(<?!= bodyItemJSON ?>);
+          // const arrayItem = Vue.reactive(<?!= bodyItemJSON ?>);
+
+          //消化項目と累積項目数を連動(本日)
+          let todayActualItemConst = bodyItem.todayActualItem[0];
+          const todayTotalActualItem = Vue.computed(() => {
+            if(bodyItem.todayActualItem[0] != todayActualItemConst){
+              const num = bodyItem.todayActualItem[0] - todayActualItemConst;
+              var todayTotalActualItem = bodyItem.todayTotalActualItem[0] + num;
+              bodyItem.todayTotalActualItem[0] = bodyItem.todayTotalActualItem[0] + num;
+              todayActualItemConst = todayActualItemConst + num ;
+            }else{
+              var todayTotalActualItem = bodyItem.todayTotalActualItem[0];
+            }
+          return todayTotalActualItem;
+          });
+
+          //予定項目数と累積項目数を連動(本日)
+          let todayPlanUsingItemConst = bodyItem.todayPlanUsingItem[0];
+          const todayTotalPlanUsingItem = Vue.computed(() => {
+            if(bodyItem.todayPlanUsingItem[0] != todayPlanUsingItemConst){
+              const num = bodyItem.todayPlanUsingItem[0] - todayPlanUsingItemConst;
+              var todayTotalPlanUsingItem = bodyItem.todayTotalPlanUsingItem[0] + num;
+              bodyItem.todayTotalPlanUsingItem[0] = bodyItem.todayTotalPlanUsingItem[0] + num;
+              todayPlanUsingItemConst = todayPlanUsingItemConst + num ;
+            }else{
+              var todayTotalPlanUsingItem = bodyItem.todayTotalPlanUsingItem[0];
+            }
+          return todayTotalPlanUsingItem;
+          });
+
+          //実工数と累積時間を連動(本日)
+          let todayActualTimeConst = bodyItem.todayActualTime[0];
+          const todayTotalActualTime = Vue.computed(() => {
+            if(bodyItem.todayActualTime[0] != todayActualTimeConst){
+              const num = bodyItem.todayActualTime[0] - todayActualTimeConst;
+              var todayTotalActualTime = bodyItem.todayTotalActualTime[0] + num;
+              bodyItem.todayTotalActualTime[0] = bodyItem.todayTotalActualTime[0] + num;
+              todayActualTimeConst = todayActualTimeConst + num ;
+            }else{
+              var todayTotalActualTime = bodyItem.todayTotalActualTime[0];
+            }
+          return todayTotalActualTime;
+          });
+
+          //予定工数と累積時間を連動(本日)
+          let todayPlanUsingTimeConst = bodyItem.todayPlanUsingTime[0];
+          const todayTotalPlanUsingTime = Vue.computed(() => {
+            if(bodyItem.todayPlanUsingTime[0] != todayPlanUsingTimeConst){
+              const num = bodyItem.todayPlanUsingTime[0] - todayPlanUsingTimeConst;
+              var todayTotalPlanUsingTime = bodyItem.todayTotalPlanUsingTime[0] + num;
+              bodyItem.todayTotalPlanUsingTime[0] = bodyItem.todayTotalPlanUsingTime[0] + num;
+              todayPlanUsingTimeConst = todayPlanUsingTimeConst + num ;
+            }else{
+              var todayTotalPlanUsingTime = bodyItem.todayTotalPlanUsingTime[0];
+            }
+          return todayTotalPlanUsingTime;
+          });
+
+          //消化項目と累積項目数を連動(明日)
+          let tomorrowActualItemConst = bodyItem.tomorrowActualItem[0];
+          const tomorrowTotalActualItem = Vue.computed(() => {
+            if(bodyItem.tomorrowActualItem[0] != tomorrowActualItemConst){
+              const num = bodyItem.tomorrowActualItem[0] - tomorrowActualItemConst;
+              var tomorrowTotalActualItem = bodyItem.tomorrowTotalActualItem[0] + num;
+              bodyItem.tomorrowTotalActualItem[0] = bodyItem.tomorrowTotalActualItem[0] + num;
+              tomorrowActualItemConst = tomorrowActualItemConst + num ;
+            }else{
+              var tomorrowTotalActualItem = bodyItem.tomorrowTotalActualItem[0];
+            }
+          return tomorrowTotalActualItem;
+          });
+
+          //予定項目数と累積項目数を連動(明日)
+          let tomorrowPlanUsingItemConst = bodyItem.tomorrowPlanUsingItem[0];
+          const tomorrowTotalPlanUsingItem = Vue.computed(() => {
+            if(bodyItem.tomorrowPlanUsingItem[0] != tomorrowPlanUsingItemConst){
+              const num = bodyItem.tomorrowPlanUsingItem[0] - tomorrowPlanUsingItemConst;
+              var tomorrowTotalPlanUsingItem = bodyItem.tomorrowTotalPlanUsingItem[0] + num;
+              bodyItem.tomorrowTotalPlanUsingItem[0] = bodyItem.tomorrowTotalPlanUsingItem[0] + num;
+              tomorrowPlanUsingItemConst = tomorrowPlanUsingItemConst + num ;
+            }else{
+              var tomorrowTotalPlanUsingItem = bodyItem.tomorrowTotalPlanUsingItem[0];
+            }
+          return tomorrowTotalPlanUsingItem;
+          });
+
+          //実工数と累積時間を連動(明日)
+          let tomorrowActualTimeConst = bodyItem.tomorrowActualTime[0];
+          const tomorrowTotalActualTime = Vue.computed(() => {
+            if(bodyItem.tomorrowActualTime[0] != tomorrowActualTimeConst){
+              const num = bodyItem.tomorrowActualTime[0] - tomorrowActualTimeConst;
+              var tomorrowTotalActualTime = bodyItem.tomorrowTotalActualTime[0] + num;
+              bodyItem.tomorrowTotalActualTime[0] = bodyItem.tomorrowTotalActualTime[0] + num;
+              tomorrowActualTimeConst = tomorrowActualTimeConst + num ;
+            }else{
+              var tomorrowTotalActualTime = bodyItem.tomorrowTotalActualTime[0];
+            }
+          return tomorrowTotalActualTime;
+          });
+
+          //予定工数と累積時間を連動(明日)
+          let tomorrowPlanUsingTimeConst = bodyItem.tomorrowPlanUsingTime[0];
+          const tomorrowTotalPlanUsingTime = Vue.computed(() => {
+            if(bodyItem.tomorrowPlanUsingTime[0] != tomorrowPlanUsingTimeConst){
+              const num = bodyItem.tomorrowPlanUsingTime[0] - tomorrowPlanUsingTimeConst;
+              var tomorrowTotalPlanUsingTime = bodyItem.tomorrowTotalPlanUsingTime[0] + num;
+              bodyItem.tomorrowTotalPlanUsingTime[0] = bodyItem.tomorrowTotalPlanUsingTime[0] + num;
+              tomorrowPlanUsingTimeConst = tomorrowPlanUsingTimeConst + num ;
+            }else{
+              var tomorrowTotalPlanUsingTime = bodyItem.tomorrowTotalPlanUsingTime[0];
+            }
+          return tomorrowTotalPlanUsingTime;
+          });
+
+          const displayValue = Vue.computed(() => {
+            var rateList = {
+            todayPlanUsingItemProgress      : [bodyItem.todayTotalPlanUsingItem[0],bodyItem.totalItems[0]],//予定進捗率（本日）
+            todayPlanUsingTimeProgress      : [bodyItem.todayTotalPlanUsingTime[0],bodyItem.planTotalTime[0]],//予定工数進捗（本日）
+
+            todayActualItemProgress         : [bodyItem.todayTotalActualItem[0],bodyItem.totalItems[0]],//進捗率（本日）
+            todayActualTimeProgress         : [bodyItem.todayTotalActualTime[0],bodyItem.planTotalTime[0]],//工数進捗（本日）
+
+            tomorrowPlanUsingItemProgress   : [bodyItem.tomorrowTotalPlanUsingItem[0],bodyItem.totalItems[0]],//予定進捗率(計画)(次日)
+            tomorrowActualItemProgress      : [bodyItem.tomorrowTotalActualItem[0],bodyItem.totalItems[0]],//予定進捗率(実績)(次日)
+            tomorrowPlanUsingTimeProgress   : [bodyItem.tomorrowTotalPlanUsingTime[0],bodyItem.planTotalTime[0]],//予定工数進捗(計画)(次日)
+            tomorrowActualUsingTimeProgress : [bodyItem.tomorrowTotalActualTime[0],bodyItem.planTotalTime[0]],//予定工数進捗(実績)(次日)
+            };
+
+                var progressRate = {};
+                for(key in rateList){
+                  progressRate[key] = Math.round( rateList[key][0] / rateList[key][1] * 100 );
+                };
+
+                if(bodyItem.tomorrowActualTime[0] != 0){
+                  var tomorrowPlanBody = `
+・${bodyItem.taskName[0]}
+　予定進捗率     ：${progressRate['tomorrowActualItemProgress']}%[${bodyItem.tomorrowTotalActualItem[0]}/${bodyItem.totalItems[0]}]／${progressRate['tomorrowPlanUsingItemProgress']}%[${bodyItem.tomorrowTotalPlanUsingItem[0]}/${bodyItem.totalItems[0]}]
+　予定工数進捗   ：${progressRate['tomorrowActualUsingTimeProgress']}%[${Math.round( bodyItem.tomorrowTotalActualTime[0])}/${bodyItem.planTotalTime[0]}h]／${progressRate['tomorrowPlanUsingTimeProgress']}%[${bodyItem.tomorrowTotalPlanUsingTime[0]}/${bodyItem.planTotalTime[0]}h]
+　予定実施項目数 ：${bodyItem.tomorrowActualItem[0]}項目[${bodyItem.tomorrowActualTime[0]}h]／${bodyItem.tomorrowPlanUsingItem[0]}項目[${bodyItem.tomorrowPlanUsingTime[0]}h]
+${bodyItem.tomorrowMemo[0]}
+`;
+
+                }else{
+                  var tomorrowPlanBody = `
+・
+`;
+                };
+
+                const basic_bady = `各位
+
+お疲れ様です。
+${bodyItem.familyName[0]}です。
+本日の日報を送付致します。
+/-----------------------------------------------------------------/
+
+①プロジェクト名
+
+【MDM】
+
+/-----------------------------------------------------------------/
+
+②本日の作業計画・・・[目標進捗]
+
+・${bodyItem.taskName[0]}
+　予定進捗率     ：${progressRate['todayPlanUsingItemProgress']}%[${bodyItem.todayTotalPlanUsingItem[0]}/${bodyItem.totalItems[0]}]
+　予定工数進捗   ：${progressRate['todayPlanUsingTimeProgress']}%[${bodyItem.todayTotalPlanUsingTime[0]}/${bodyItem.planTotalTime[0]}h]
+　予定実施項目数 ：${bodyItem.todayPlanUsingItem[0]}項目[${bodyItem.todayPlanUsingTime[0]}h]
+
+/-----------------------------------------------------------------/
+
+③本日の作業実績  [実績進捗]/[目標進捗]
+
+・${bodyItem.taskName[0]}
+　開始予定       ：${bodyItem.startDay[0].replace(/-/g, '/')}
+　完了予定       ：${bodyItem.completeDay[0].replace(/-/g, '/')}
+　進捗率         ：${progressRate['todayActualItemProgress']}%[${bodyItem.todayTotalActualItem[0]}/${bodyItem.totalItems[0]}]／${progressRate['todayPlanUsingItemProgress']}%[${bodyItem.todayTotalPlanUsingItem[0]}/${bodyItem.totalItems[0]}]
+　工数進捗       ：${progressRate['todayActualTimeProgress']}%[${Math.round( bodyItem.todayTotalActualTime[0])}/${bodyItem.planTotalTime[0]}h]／${progressRate['todayPlanUsingTimeProgress']}%[${bodyItem.todayTotalPlanUsingTime[0]}/${bodyItem.planTotalTime[0]}h]
+　今日の実績     ：${bodyItem.todayActualItem[0]}項目[${bodyItem.todayActualTime[0]}h]／${bodyItem.todayPlanUsingItem[0]}項目[${bodyItem.todayPlanUsingTime[0]}h]
+　総項目数       ：${bodyItem.totalItems[0]}項目
+${bodyItem.todayMemo[0]}
+
+/-----------------------------------------------------------------/
+
+④明日の作業予定   [実績進捗]/[目標進捗]
+${tomorrowPlanBody}
+
+/-----------------------------------------------------------------/
+
+⑤問題点
+・なし
+
+/-----------------------------------------------------------------/
+
+⑥依頼事項
+・なし
+
+/-----------------------------------------------------------------/
+
+⑦連絡事項
+・なし
+
+/-----------------------------------------------------------------/
+
+以上です。
+よろしくお願い致します。
+
+`
+                  return basic_bady; 
+          });
+
+          const copy = () => {
+              const text = document.getElementsByTagName("textarea")[0];
+              text.select();
+              document.execCommand("copy");
+          }
+
+          let deta =  Vue.reactive({
+            show : false
+            });
+
+
+          const createGmail = () => {
+            deta.show = !deta.show;
+              $("#overlay").fadeIn(500);
+              const body = document.getElementsByTagName("textarea")[0].value;
+              const subject = bodyItem.subject[0];
+              const to      = bodyItem.destination[0];
+              google.script.run.withSuccessHandler(function(){
+                  google.script.host.close();
+              }).createGmail(to,subject,body);
+          }
+
+          return {
+            bodyItem,
+            todayTotalActualItem,
+            todayTotalPlanUsingItem,
+            todayTotalActualTime,
+            todayTotalPlanUsingTime,
+
+            tomorrowTotalActualItem,
+            tomorrowTotalPlanUsingItem,
+            tomorrowTotalActualTime,
+            tomorrowTotalPlanUsingTime,
+
+            displayValue,
+            copy,
+            createGmail,
+            deta,
+            }
+
+        }
+      }
+
+      Vue.createApp(myApp).mount('#app');
+  </script>
+
+    </div>
+  </body>
+  
+</html>

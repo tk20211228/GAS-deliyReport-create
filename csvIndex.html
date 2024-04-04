@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <base target="_top">
+    <?!= inputLib ?>
+    <style>
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .spinner-grow {
+            width: 9rem;
+            height: 9rem;
+        }
+        .form-section {
+            background: #edf0ff;
+        }
+        .wrapper {
+          display: flex;
+        }
+    </style>
+  </head>
+  <body>
+    <!-- Spinnerを追加 -->
+    <div id="overlay">
+      <div class="d-flex justify-content-center align-items-center" style="height:100%;">
+        <div class="spinner-grow text-light" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-section m-2">
+       <div class="container-fluid">
+        <div class="m-2 row d-flex">
+              <form>
+                <div class="col-6 mt-2 d-flex align-items-center">
+                  <label class="col-sm-2 col-form-label">差出人</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="myEmail" value="<?= bodyItem.userEmail ?>" readonly>
+                  </div>
+                </div>
+                <div class="col-6 mt-2 d-flex align-items-center">
+                  <label class="col-sm-2 col-form-label">宛先</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="destination" value="<?= bodyItem.destination ?>" readonly>
+                  </div>
+                </div>
+                <div class="col-6 mt-2 d-flex align-items-center">
+                  <label class="col-sm-2 col-form-label">件名</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="subject" value="<?= bodyItem.subject ?>">
+                  </div>
+                </div>
+                <div class="col-12 mt-2">
+                <div class="wrapper">
+                    <div class="col-9 m-2">
+                      <textarea class="form-control form-control-sm" id="report" style="height:415px"><?= bodyItem.reportBody ?></textarea>
+                    </div>
+                    <div class="col-3 m-2">
+                      <div>[メール設定]</div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="「差出人」" id="senderCheck">
+                        <label class="form-check-label" for="senderCheck">
+                          「差出人」に問題はないか。
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="「宛先」" id="addressCheck">
+                        <label class="form-check-label" for="addressCheck">
+                          「宛先」に問題はないか。
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="「件名」" id="subjectCheck">
+                        <label class="form-check-label" for="subjectCheck">
+                          「件名」に問題はないか。
+                        </label>
+                      </div>
+                      <hr>
+                      <div>[本日の予定]</div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="「予定のタスク名」" id="todayTaskPlanCheck">
+                        <label class="form-check-label" for="todayTaskPlanCheck">
+                          タスク名に問題はないか。
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="「予定の合計工数」" id="todayTaskTimePlan">
+                        <label class="form-check-label" for="todayTaskTimePlan">
+                          工数の合計に問題ないか。
+                        </label>
+                      </div>
+                      <hr>
+                      <div>[本日の実績]</div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="「実績のタスク名」" id="todayTaskCheck">
+                        <label class="form-check-label" for="todayTaskCheck">
+                          タスク名に問題はないか。
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="「実績の合計工数」" id="todayTaskTimeCheck">
+                        <label class="form-check-label" for="todayTaskTimeCheck">
+                          工数の合計に問題ないか。
+                        </label>
+                      </div>
+                      <hr>
+                      <div>[明日の予定]</div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="「明日のタスク名」" id="tomorrowTaskCheck">
+                        <label class="form-check-label" for="tomorrowTaskCheck">
+                          タスク名に問題はないか。
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="「明日の合計工数」" id="tomorrowTaskTimeCheck">
+                        <label class="form-check-label" for="tomorrowTaskTimeCheck">
+                          工数の合計に問題ないか。
+                        </label>
+                      </div>
+                    </div>
+                </div>
+                    <button id="createGmail" type="button" class="btn btn-outline-primary m-2"> 
+                      Gmailの下書きに出力する
+                    </button>
+                    <button type="button" class="btn btn-outline-success m-2" id="textcopy" >テキストを全てコピーする</button>
+                    <button id="reCreateReport" type="button" class="btn btn-outline-info m-2">日報を再出力</button>
+                    <button type="button" class="btn btn-outline-secondary m-2" onclick="google.script.host.close()">閉じる</button>
+              </form>
+          </div>
+       </div>
+     </div>
+    </div>
+
+    <script>
+      const OVERLAY_ID = 'overlay';
+      var notyf;
+      // https://carlosroso.com/notyf/
+      function initializeNotyf() {
+          notyf = new Notyf({
+          duration: 5000,
+          position: {
+            x: 'right',
+            y: 'top',
+          },
+          types: [
+            {
+              type: 'warning',
+              background: 'orange',
+              duration: 150000,
+              icon: {
+                className: 'spinner-border text-light'
+                // tagName: 'i'
+              }
+            },
+            {
+              type: 'error',
+              background: 'indianred',
+              duration: 1500,
+              dismissible: true
+            }
+          ]
+         });
+      }
+      window.onload = initializeNotyf();
+
+      function toggleOverlayDisplay(isVisible) {
+          const overlay = document.getElementById(OVERLAY_ID);
+          overlay.style.display = isVisible ? 'block' : 'none';
+      }
+
+      function reCreateReport(){
+        notyf.dismissAll();
+        const notification = notyf.open({
+          type: 'warning',
+          message: '<b>実行中</b><br/>「日報」を再出力しています。'
+          });
+        const taskListString = '<?= taskListString ?>';  // JSON文字列を取得
+        const taskList = JSON.parse(taskListString);    // JSON文字列をオブジェクトに変換
+        toggleOverlayDisplay(true);
+        google.script.run.withSuccessHandler(function (){
+          toggleOverlayDisplay(false);
+          notyf.dismiss(notification);
+          notyf.success('<b>完了</b><br/>「日報」を出力します。');
+        }).withFailureHandler(function(error){ 
+          console.error(error);
+          notyf.error('<b>Error:</b><br/>' + error.message);
+        }).csvCreateReport({taskList});
+      }
+
+      function createReport(){
+        const checkResult = formCheck();
+        if(!checkResult) return;
+        const notification = notyf.open({
+          type: 'warning',
+          message: '<b>実行中</b><br/>「Gmailの下書き」を出力しています。'
+          });
+        const body    = document.getElementsByTagName("textarea")[0].value;
+        const subject = document.getElementById('subject').value;
+        const to      = document.getElementById('destination').value;
+        toggleOverlayDisplay(true);
+        google.script.run.withSuccessHandler(function(){
+          toggleOverlayDisplay(false);
+          notyf.dismiss(notification);
+          notyf.success('<b>完了</b><br/>「Gmailの下書き」が完了しました。');
+          // google.script.host.close();
+          }).createGmail(to,subject,body);
+      }
+
+      function textCopy(){
+        const text = document.getElementsByTagName("textarea")[0];
+        text.select();
+        document.execCommand("copy");
+        notyf.dismissAll();
+        notyf.success('<b>完了</b><br/>クリップボードに「日報」をコピーしました。');
+      }
+
+      function formCheck(){
+        notyf.dismissAll();
+        const formChecks = document.querySelectorAll('.form-check input');
+        let checkArray = [];
+        formChecks.forEach(check => checkArray.push([check.value,check.checked]));
+        let checkResult = true;
+        checkArray.forEach(check => {
+          if(!check[1]){
+            notyf.open({
+              type: 'error',
+              message: `<b>${check[0]}</b>に確認チェックがありません。`
+            });
+            checkResult = false;
+          }
+        })
+        return checkResult;
+      }
+
+      document.getElementById("reCreateReport").addEventListener("click",reCreateReport);
+      document.getElementById('createGmail').addEventListener('click',createReport);
+      document.getElementById('textcopy').addEventListener('click',textCopy)
+
+    </script>
+
+    </div>
+  </body>
+  
+</html>

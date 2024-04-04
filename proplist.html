@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.7.1/dist/vuetify.min.css" rel="stylesheet">
+    <style>
+      html, body{
+        overflow: hidden;
+      }
+    </style>
+
+    <script>
+      //GAS側からのプロパティ値をpropdataに入れる
+      function onSuccess(data){
+        //vmのpropdataにそのまま入れる
+        var json = JSON.parse(data);
+        vm.propdata = json;
+      }
+
+      //GAS側からの処理結果
+      function onDelprop(data){
+        if(data == "OK"){
+          alert("プロパティをすべて削除しました。");
+          vm.propdata = [];
+          vm.sheet = false;
+        }else{
+          alert("処理は失敗しました。");
+        }
+      }
+
+      //プロパティ削除メッセージ
+      function onMessage(data){
+          alert(data);
+      }
+
+      //プロパティの新規追加完了
+      function onPropsave(data){
+        //処理結果によって分岐
+        if(data == "OK"){
+          //propデータを再取得
+          vm.propdata = [];
+          google.script.run.withSuccessHandler(onSuccess).onProp();
+
+          //変数を初期化
+          vm.recman = {};
+
+          //ダイアログを閉じる
+          vm.dialog = false;
+        }else{
+          alert("プロパティの登録に失敗しました");
+          return;
+        }
+      }
+
+    </script>
+  </head>
+  <body>
+    <div id="app" v-cloak>
+      <v-app>
+        <v-card outlined>
+          <v-simple-table fixed-header height="300px">
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">
+                    プロパティ名
+                  </th>
+                  <th class="text-left">
+                    設定値
+                  </th>
+                  <th class="text-left">
+                    タイプ
+                  </th>
+                  <th class="text-left">
+                    アクション
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in propdata" :key="item.name">
+                  <td>{{ item.propname }}</td>
+                  <td>{{ item.propvalue }}</td>
+                  <td>{{ item.proptype }}</td>
+                  <td>
+                    <v-icon small class="mr-2" @click="deleteItem(item)">
+                      mdi-delete
+                    </v-icon>
+                  </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+
+          <template>
+            <v-bottom-sheet v-model="sheet" inset>
+              <v-sheet class="text-center" height="200px">
+                <v-btn class="mt-6" text color="error" @click="onApprove">実行</v-btn>
+                <v-btn class="mt-6" text color="error" @click="onReject">キャンセル</v-btn>
+                <div class="my-3">プロパティをすべて削除しますか？</div>
+              </v-sheet>
+            </v-bottom-sheet>
+          </template>
+
+          <template>
+            <v-row class="text-center">
+              <v-dialog v-model="dialog" persistent max-width="500">
+                <!-- カードで整形する -->
+                <v-form ref="formman">
+                  <v-card>
+                    <span>{{dialogtitle}}</span>
+                    <v-card-text>
+                      <v-container>
+                        <v-row>
+                          <v-col cols="12" sm="6"	md="4">
+                            <v-text-field label="プロパティ名*" required v-model="recman.propname" :rules="[rules.required]">
+                            </v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6"	md="4">
+                            <v-text-field label="設定値*" required v-model="recman.propvalue" :rules="[rules.required]">
+                            </v-text-field>
+                          </v-col>
+                        </v-row>
+                        <v-row>
+                          <div>プロパティタイプ</div>
+                          <v-radio-group v-model="recman.proptype" row :rules="[rules.required]">
+                            <v-radio label="スクリプト" value="0"></v-radio>
+                            <!-- <v-radio label="ユーザ" value="1"></v-radio> -->
+                          </v-radio-group>
+                        </v-row>
+                      </v-container>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="blue darken-1" text  @click="onSave">
+                        保存
+                      </v-btn>
+                      <v-btn  color="red darken-1"  text  @click="dialog = false">
+                        閉じる
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-form>
+              </v-dialog>
+            </v-row>
+          </template>
+
+          <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn  color="red darken-1"  text  @click="onAdd">新規追加</v-btn>
+              <v-btn  color="red darken-1"  text  @click="onClear">全削除</v-btn>
+              <v-btn  color="red darken-1"  text  @click="google.script.host.close()">閉じる</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.7.1/dist/vuetify.min.js"></script>
+    <script>
+      var vm = "";
+      var editflg = 0;
+
+      //Vue.jsを初期化
+        vm = new Vue({
+          el: '#app',
+          vuetify: new Vuetify(),
+			    data: () => ({
+            propdata: [],
+            sheet: false,
+            editedIndex: "",
+			      editedItem: "",
+            dialog:false,
+            notifications: false,
+            sound: true,
+            widgets: false,
+            dialogtitle:"プロパティの新規追加",
+            recman:{
+              proptype: "0",  // デフォルト値を設定
+              propname: "",
+              propvalue: ""
+            },
+            rules:{
+              //必須項目のvalidation
+			        required: value => !!value || "必ず入力してください", 
+            }
+          }),
+          mounted : function(){
+            //GAS側から一括でプロパティ値を取得する
+            google.script.run.withSuccessHandler(onSuccess).onProp();
+          },
+          methods: {
+            onClear(){
+              this.sheet = true;
+            },
+            onApprove(){
+              //プロパティを全削除する
+              google.script.run.withSuccessHandler(onDelprop).clearprop();
+            },
+            onReject(){
+              this.sheet = false;
+            },
+            onAdd(){
+              //新規追加なので、フラグは0にする
+              editflg = 0
+
+              //フォーム内容をクリア
+              // this.recman = {};
+
+              //ダイアログを開く
+              this.dialog = true;
+              this.dialogtitle = "プロパティの新規追加";
+            },
+            onSave(){
+              if (this.$refs.formman.validate()) {
+                //GAS側へデータを送る側へデータを送る
+				        google.script.run.withSuccessHandler(onPropsave).oninsert(this.recman);
+              }else {
+                console.log("NG")
+              }
+            },
+            deleteItem (item) {
+              //問い合わせ
+              var result = confirm(item.propname + '削除しますか？');
+
+              if(result) {
+                //配列から削除
+                this.editedIndex = this.propdata.indexOf(item)
+                this.editedItem = Object.assign({}, item)
+        
+                this.propdata.splice(this.editedIndex, 1)
+                this.$nextTick(() => {
+                  this.editedItem = Object.assign({}, this.defaultItem)
+                  this.editedIndex = -1
+                })
+
+                //プロパティを削除する
+                google.script.run.withSuccessHandler(onMessage).deleteman(item);
+
+              } 
+            },
+          }
+        });
+    </script>
+  </body>
+</html>
